@@ -39,7 +39,7 @@ test('derive: wa.me con mensaje prellenado codificado y tel: en E.164', () => {
   assert.equal(decodeURIComponent(dd.waLink.split('text=')[1]), `${cfg.whatsapp.greeting_event} ${cfg.whatsapp.ask}`);
   assert.equal(decodeURIComponent(dd.waLinkPromo.split('text=')[1]), cfg.whatsapp.promo_message);
   assert.equal(dd.pains.length, cfg.pains.items.length);
-  assert.ok(dd.pains[0].message.includes('rodilla o cadera al pedalear'), 'plantilla de síntoma con la zona');
+  assert.ok(dd.pains[0].message.includes('la rodilla o la cadera al pedalear'), 'plantilla de síntoma con la zona');
   assert.ok(dd.pains.every((p) => p.message.includes('MTB')), 'cada chip menciona la carrera');
   assert.ok(dd.pains.every((p) => p.link.startsWith('https://wa.me/524421234567?text=')));
   assert.equal(dd.telLink, 'tel:+524421234567');
@@ -65,7 +65,7 @@ test('index.html: CTAs y metadatos esenciales', () => {
   assert.match(html, /<html lang="es-MX">/);
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">/);
   assert.ok(html.includes(`href="${d.waLink}"`), 'CTA WhatsApp principal');
-  assert.ok(html.includes(`href="${d.vcfName}" download`), 'CTA guardar contacto');
+  assert.ok(html.includes(`href="${d.vcfName}"`) && !html.includes(`href="${d.vcfName}" download`), 'CTA guardar contacto sin atributo download (iOS abre la ficha directo)');
   assert.ok(html.includes(`href="${d.telLink}"`), 'enlace tel:');
   assert.match(html, /<dialog class="qr"/);
   assert.match(html, /<svg[^>]*>[\s\S]*<\/svg>/, 'QR inline');
@@ -117,6 +117,7 @@ test('imprimir.html: QR grande, número de respaldo y dominio', () => {
   assert.match(print, /<svg[^>]*>[\s\S]*<\/svg>/);
   assert.ok(print.includes(d.phoneDisplay));
   assert.ok(print.includes(d.host));
+  assert.ok(print.includes('precio regular $800'), 'la hoja ancla el precio regular');
   assert.ok(print.includes('$650'), 'la hoja anuncia la promo con precio');
   assert.ok(print.includes('11 de octubre'), 'fecha de vencimiento en formato largo');
   assert.ok(print.includes('class="logo"') && print.includes('brand/firma-black.svg'), 'la hoja lleva el frente de la tarjeta');
@@ -127,6 +128,8 @@ test('imprimir-whatsapp.html: hoja de respaldo con QR directo a wa.me', async ()
   assert.match(wa, /RESPALDO/);
   assert.match(wa, /<svg[^>]*>[\s\S]*<\/svg>/);
   assert.notEqual(wa, print);
+  assert.ok(!wa.includes('class="url"'), 'la hoja de respaldo no anuncia el dominio (puede no existir aún)');
+  assert.ok(wa.includes(d.phoneDisplay), 'la hoja de respaldo sí lleva el número');
 });
 
 test('vCard: estructura 3.0, CRLF, escapes y nombre partido', () => {

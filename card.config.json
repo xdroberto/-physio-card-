@@ -47,7 +47,7 @@
     "greeting_generic": "Hola Paola, vi tu tarjeta digital.",
     "ask": "Me interesa una sesión de fisioterapia a domicilio. ¿Qué días tienes disponibles?",
     "promo_message": "Hola Paola, te vi en la carrera de MTB y quiero la promo de la primera sesión a domicilio. ¿Qué días tienes disponibles?",
-    "symptom_template": "Hola Paola, te vi en la carrera de MTB. Tengo molestia en {zona}. ¿Podemos agendar una sesión a domicilio?"
+    "symptom_template": "Hola Paola, te vi en la carrera de MTB. Tengo molestias en {zona}. ¿Podemos agendar una sesión a domicilio?"
   },
   "hero": {
     "headline": "Rehabilitación integral a domicilio",
@@ -55,13 +55,13 @@
   },
   "cta": {
     "whatsapp": "Escríbeme por WhatsApp",
-    "whatsapp_sub": "Te respondo hoy",
+    "whatsapp_sub": "Te respondo el mismo día",
     "whatsapp_how": "Agendar por WhatsApp",
     "save": "Guardar contacto",
-    "save_help": "Se abre la ficha para agregarme a tus contactos. Si no se abre, mantén presionado el número.",
+    "save_help": "Se abre o se descarga mi ficha de contacto (.vcf): ábrela y toca Guardar. Si no funciona, usa Copiar número y agrégame a mano.",
     "qr": "Mostrar QR",
     "call": "Llamar",
-    "share": "Compartir con tu equipo",
+    "share": "Compartir",
     "copy": "Copiar número",
     "copied": "Número copiado",
     "link_copied": "Enlace copiado",
@@ -74,7 +74,7 @@
     "price": "$650",
     "regular_price": "$800",
     "until": "2026-10-11",
-    "text": "Incluye valoración y tratamiento. Válida si agendas por WhatsApp antes del {until} y mencionas la carrera.",
+    "text": "Incluye valoración y tratamiento. Válida si agendas por WhatsApp hasta el {until} y mencionas la carrera.",
     "cta": "Quiero la promo",
     "fine_print": "Solo para corredores de la carrera y sus acompañantes."
   },
@@ -84,39 +84,39 @@
     "items": [
       {
         "label": "Rodilla y cadera al pedalear",
-        "zone": "rodilla o cadera al pedalear"
+        "zone": "la rodilla o la cadera al pedalear"
       },
       {
         "label": "Espalda baja y cuello",
-        "zone": "espalda baja y cuello"
+        "zone": "la espalda baja y el cuello"
       },
       {
         "label": "Manos y antebrazos dormidos",
-        "zone": "manos y antebrazos"
+        "message": "Hola Paola, te vi en la carrera de MTB. Se me duermen las manos y los antebrazos al rodar. ¿Podemos agendar una sesión a domicilio?"
       },
       {
-        "label": "Masaje de descarga post carrera",
-        "message": "Hola Paola, te vi en la carrera de MTB. Quiero un masaje de descarga post carrera a domicilio. ¿Qué días tienes?"
+        "label": "Masaje de descarga",
+        "message": "Hola Paola, te vi en la carrera de MTB. Quiero un masaje de descarga a domicilio. ¿Qué días tienes?"
       },
       {
         "label": "Esguinces, caídas y tendinitis",
-        "zone": "esguince, caída o tendinitis"
+        "message": "Hola Paola, te vi en la carrera de MTB. Traigo una lesión (esguince, caída o tendinitis) y quiero que me valores. ¿Podemos agendar una sesión a domicilio?"
       },
       {
         "label": "Columna y hernias",
-        "zone": "columna"
+        "zone": "la columna"
       }
     ],
-    "note": "También atiendo post operatorio, fracturas y rehabilitación del adulto mayor (equilibrio y marcha)."
+    "note": "También atiendo postoperatorios, fracturas y rehabilitación de adultos mayores (equilibrio y marcha)."
   },
   "trust": {
     "title": "Por qué confiar",
-    "intro": "Soy Paola. Llevo 4 años tratando lesiones deportivas, dolor de columna y rehabilitación de adultos mayores. Te explico qué tienes y qué vamos a hacer, sin rodeos.",
+    "intro": "Soy Paola. Llevo 4 años atendiendo lesiones deportivas, dolor de columna y rehabilitación de adultos mayores. Te explico qué tienes y qué vamos a hacer, sin rodeos.",
     "items": [
       "1 año en el CRIT Teletón",
       "4 años de práctica clínica",
       "Certificada en punción seca",
-      "Vendaje neuromuscular, electroterapia, ultrasonido y terapia manual",
+      "Vendaje neuromuscular (kinesiotape), electroterapia, ultrasonido y terapia manual",
       "Camilla y equipo propio: la sesión completa en tu casa"
     ],
     "verify_label": "Verificar en el Registro Nacional de Profesionistas"
@@ -135,7 +135,7 @@
   "contact_section": {
     "title": "Guárdame para cuando te duela",
     "sub": "Si ahora no puedes escribir, guárdame y me mandas mensaje cuando llegues a casa.",
-    "coverage": "Querétaro y zona metropolitana. Atención con cita. Respondo mensajes de lunes a sábado.",
+    "coverage": "Querétaro y zona metropolitana. Sesiones con cita de lunes a sábado.",
     "disclaimer": "Esta página es informativa y no sustituye una valoración presencial."
   },
   "share": {
@@ -150,11 +150,11 @@
     "hook": "¿Terminaste la rodada con dolor?",
     "instruction": "Escanea y escríbeme por WhatsApp",
     "instruction_sub": "Abre la cámara de tu celular y apúntala al código: se abre mi tarjeta y me escribes en un toque. También puedes guardar mi contacto.",
-    "promo_line": "Promo de la carrera: primera sesión a domicilio a {price}. Válida hasta el {until}.",
+    "promo_line": "Promo de la carrera: primera sesión a domicilio a {price} (precio regular {regular_price}). Válida hasta el {until}.",
     "fallback_label": "si el QR no abre, escríbeme directo"
   },
   "og": {
     "title": "Paola García Moctezuma · Fisioterapeuta a domicilio en Querétaro",
-    "description": "Rehabilitación integral a domicilio. Céd. Prof. 15860222. Recuperación post carrera, lesiones y columna. Citas por WhatsApp: 442 550 0158."
+    "description": "Rehabilitación integral a domicilio. Céd. Prof. 15860222. Recuperación después de la carrera, lesiones y columna. Citas por WhatsApp: 442 550 0158."
   }
 }

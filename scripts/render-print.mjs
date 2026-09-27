@@ -10,9 +10,9 @@ export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' 
   const { person, contact, theme: t } = cfg;
   const isWa = mode === 'wa';
   const svg = isWa ? svgWa : svgPrint;
-  const instruction = isWa ? 'Escanea y me llega tu WhatsApp' : p.instruction || 'Escanea y escríbeme por WhatsApp';
+  const instruction = p.instruction || 'Escanea y escríbeme por WhatsApp';
   const instructionSub = isWa
-    ? 'Abre la cámara de tu celular y apúntala al código. Se abre WhatsApp con el mensaje listo.'
+    ? 'Abre la cámara de tu celular y apúntala al código. Se abre WhatsApp con el mensaje listo: solo toca Enviar.'
     : p.instruction_sub || 'Abre la cámara de tu celular y apúntala al código';
   return `<!doctype html>
 <html lang="es-MX">
@@ -66,7 +66,7 @@ export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' 
   ${d.printPromoLine ? `<div class="promo">${esc(d.printPromoLine)}</div>` : ''}
   <div class="fallback">
     <div><span class="lbl">${esc(contact.phone_label || 'Citas')} · ${esc(p.fallback_label || 'si el QR no abre')}</span><b>${esc(d.phoneDisplay)}</b></div>
-    <div class="right">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}<br><span class="url">${esc(d.host)}</span></div>
+    <div class="right">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}${isWa ? '' : `<br><span class="url">${esc(d.host)}</span>`}</div>
   </div>
 </main>
 </body>

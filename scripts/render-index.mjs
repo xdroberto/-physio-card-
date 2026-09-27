@@ -149,7 +149,7 @@ b{font-weight:600}
 .zona{font-size:14.5px;font-weight:300;color:var(--muted-dark);line-height:1.4}
 @media (min-width:420px){.zona{text-align:right}}
 .actions{display:grid;gap:10px;margin-top:22px}
-.actions__row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions__row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 
 /* ---------- Botones ---------- */
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 16px;border-radius:var(--r);font-family:var(--sans);font-weight:500;font-size:17px;line-height:1.15;letter-spacing:.01em;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .08s ease,filter .08s ease;cursor:pointer;text-align:center}
@@ -178,7 +178,7 @@ section+section{border-top:1px solid var(--line-soft)}
 .promo__text{font-size:16px;font-weight:400}
 .promo .btn{margin-top:14px}
 .promo__fine{font-size:13.5px;font-weight:400;color:var(--muted);margin-top:10px}
-.pains{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pains{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .pain{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px;padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:500;font-size:15.5px;line-height:1.2;text-decoration:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .pain:active{background:var(--black);color:var(--cream)}
 .pain svg{width:18px;height:18px;flex:none}
@@ -201,7 +201,8 @@ section+section{border-top:1px solid var(--line-soft)}
 .how .btn{margin-top:16px}
 .save-help{font-size:14px;font-weight:300;color:var(--muted);margin:8px 0 12px}
 .phone{font-size:30px;font-weight:300;margin:0 0 14px;user-select:all;-webkit-user-select:all}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.grid2 .btn{padding-left:10px;padding-right:10px}
 .legal{margin-top:20px;font-size:14px;font-weight:300;color:var(--muted);display:grid;gap:6px}
 .legal .host{font-weight:500;color:var(--ink)}
 
@@ -261,7 +262,7 @@ dialog.qr::backdrop{background:var(--cream)}
         <span class="btn__sub">${esc(cta.whatsapp_sub)}</span>
       </a>
       <div class="actions__row">
-        <a class="btn btn--outline-cream" href="${attr(d.vcfName)}" download data-umami-event="vcard-hero">${icon('contact')}<span>${esc(cta.save)}</span></a>
+        <a class="btn btn--outline-cream" href="${attr(d.vcfName)}" data-umami-event="vcard-hero">${icon('contact')}<span>${esc(cta.save)}</span></a>
         <a class="btn btn--outline-cream" href="${attr(d.telLink)}" data-umami-event="llamar-hero-btn">${icon('phone')}<span>${esc(cta.call)}</span></a>
       </div>
     </nav>
@@ -296,7 +297,7 @@ dialog.qr::backdrop{background:var(--cream)}
   <section aria-labelledby="contact-title" id="contacto">
     <h2 class="h2" id="contact-title">${esc(cs.title)}</h2>
     <p class="lead">${esc(cs.sub || '')}</p>
-    <a class="btn btn--black" href="${attr(d.vcfName)}" download data-umami-event="vcard-contacto">${icon('contact')}<span>${esc(cta.save)}</span></a>
+    <a class="btn btn--black" href="${attr(d.vcfName)}" data-umami-event="vcard-contacto">${icon('contact')}<span>${esc(cta.save)}</span></a>
     <p class="save-help">${esc(cta.save_help || '')}</p>
     <p class="phone num" id="phone">${esc(d.phoneDisplay)}</p>
     <div class="grid2">${channels}</div>
