@@ -1,21 +1,19 @@
 import { esc } from './html.mjs';
+import { inlineSvg } from './brand.mjs';
 
-// Hoja tamaño carta para pegar en la carpa: QR grande, gancho, qué pasa al escanear y,
-// como respaldo si el QR falla, el número y el dominio en texto grande.
+// Hoja tamaño carta para pegar en la carpa, con el frente de la tarjeta (crema, logo, wordmark,
+// firma), el QR sobre blanco y, como respaldo, el número y el dominio en texto grande.
 // mode 'site': el QR abre la tarjeta (paola.robertobh.dev/?src=qr-hoja).
 // mode 'wa':   el QR abre WhatsApp directo (por si el dominio no está listo a tiempo).
-export function renderPrint({ cfg, d, svgPrint, svgWa }, { mode = 'site' } = {}) {
+export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' } = {}) {
   const p = cfg.print || {};
-  const person = cfg.person;
-  const t = cfg.theme || {};
-  const accent = t.accent || '#0f766e';
-  const ink = t.ink || '#111111';
+  const { person, contact, theme: t } = cfg;
   const isWa = mode === 'wa';
   const svg = isWa ? svgWa : svgPrint;
   const instruction = isWa ? 'Escanea y me llega tu WhatsApp' : p.instruction || 'Escanea y escríbeme por WhatsApp';
   const instructionSub = isWa
-    ? 'Abre la cámara de tu teléfono y apúntala al código. Se abre WhatsApp con el mensaje listo.'
-    : p.instruction_sub || 'Abre la cámara de tu teléfono y apúntala al código';
+    ? 'Abre la cámara de tu celular y apúntala al código. Se abre WhatsApp con el mensaje listo.'
+    : p.instruction_sub || 'Abre la cámara de tu celular y apúntala al código';
   return `<!doctype html>
 <html lang="es-MX">
 <head>
@@ -24,47 +22,52 @@ export function renderPrint({ cfg, d, svgPrint, svgWa }, { mode = 'site' } = {})
 <meta name="robots" content="noindex">
 <title>Imprimir QR${isWa ? ' (respaldo WhatsApp)' : ''} · ${esc(person.name)}</title>
 <style>
-  @page { size: letter portrait; margin: 12mm; }
+  @font-face { font-family: "Italiana"; src: url(fonts/italiana-400.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Jost"; src: url(fonts/jost-var.woff2) format("woff2"); font-weight: 100 900; }
+  @page { size: letter portrait; margin: 0; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: #fff; color: ${ink}; }
-  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .sheet { width: 8.5in; min-height: 11in; margin: 0 auto; padding: 0.45in 0.5in 0.4in; display: flex; flex-direction: column; align-items: center; text-align: center; }
-  .top { width: 100%; border-top: 6px solid ${accent}; padding-top: 14pt; }
-  .eyebrow { font-size: 12.5pt; letter-spacing: .18em; text-transform: uppercase; color: ${accent}; font-weight: 700; margin: 0 0 6pt; }
-  h1 { font-size: 32pt; line-height: 1.1; margin: 0 0 6pt; letter-spacing: -.01em; }
-  .sub { font-size: 13pt; color: #444; margin: 0; }
-  .qr { width: 5.1in; height: 5.1in; margin: 14pt auto 4pt; }
+  html, body { margin: 0; background: #fff; color: ${t.black}; }
+  body { font-family: "Jost", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .sheet { width: 8.5in; height: 11in; margin: 0 auto; padding: 0.5in 0.6in 0.4in; background: ${t.cream}; display: flex; flex-direction: column; align-items: center; text-align: center; page-break-after: always; }
+  .brand { display: grid; justify-items: center; gap: 10pt; }
+  .brand .logo { width: 80pt; height: auto; color: ${t.black}; }
+  .brand .wordmark { width: 230pt; height: auto; color: ${t.black}; }
+  .brand .firma { width: 200pt; height: auto; }
+  .tagline { font-family: "Italiana", Georgia, serif; font-weight: 400; font-size: 32pt; line-height: 1.02; margin: 14pt 0 3pt; }
+  .hook { font-size: 14pt; font-weight: 400; color: #4A423E; margin: 0; }
+  .qr { width: 4.3in; height: 4.3in; margin: 12pt auto 4pt; background: #fff; border-radius: 12pt; padding: 10pt; }
   .qr svg { width: 100%; height: 100%; display: block; }
-  .scan { font-size: 21pt; font-weight: 800; margin: 4pt 0 2pt; }
-  .scan small { display: block; font-size: 12pt; font-weight: 500; color: #444; margin-top: 3pt; max-width: 6.5in; margin-left: auto; margin-right: auto; }
-  .promo { margin-top: 8pt; background: ${t.promo || '#FFD84D'}; color: ${t.promo_ink || '#111'}; border: 2.5pt solid ${t.promo_ink || '#111'}; border-radius: 10pt; padding: 8pt 14pt; font-size: 13pt; font-weight: 800; }
-  .fallback { margin-top: 10pt; width: 100%; border: 2px dashed #bbb; border-radius: 10pt; padding: 9pt 12pt; font-size: 12pt; color: #333; }
-  .fallback b { font-size: 20pt; display: block; color: ${ink}; letter-spacing: .02em; }
-  .url { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 15pt; color: ${accent}; font-weight: 700; margin: 6pt 0 0; word-break: break-all; }
-  .foot { margin-top: auto; font-size: 10pt; color: #777; padding-top: 10pt; }
+  .scan { font-size: 21pt; font-weight: 500; margin: 2pt 0 2pt; }
+  .scan small { display: block; font-size: 11.5pt; font-weight: 400; color: #4A423E; margin: 3pt auto 0; max-width: 6.3in; }
+  .promo { margin-top: 8pt; border: 1.5pt solid ${t.black}; border-radius: 10pt; padding: 7pt 14pt; font-size: 13pt; font-weight: 500; }
+  .fallback { margin-top: 10pt; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; align-items: end; text-align: left; border-top: 1pt solid ${t.black}; padding-top: 10pt; }
+  .fallback .lbl { font-size: 10.5pt; letter-spacing: .12em; text-transform: uppercase; color: #4A423E; display: block; }
+  .fallback b { font-size: 24pt; font-weight: 300; display: block; letter-spacing: .01em; }
+  .fallback .right { text-align: right; font-size: 12pt; font-weight: 300; color: #4A423E; line-height: 1.35; }
+  .fallback .url { font-weight: 500; color: ${t.black}; font-size: 14pt; }
   .noprint { position: fixed; top: 0; left: 0; right: 0; background: #111; color: #fff; padding: 10px 16px; font-size: 14px; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
-  .noprint button { font: inherit; background: ${accent}; color: #fff; border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 700; }
-  @media print { .noprint { display: none; } .sheet { padding-top: 0; } }
-  @media screen { body { padding-top: 56px; background: #e9e9e9; } .sheet { background: #fff; box-shadow: 0 2px 20px rgba(0,0,0,.15); margin: 16px auto; } }
+  .noprint button { font: inherit; background: ${t.cream}; color: ${t.black}; border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 600; }
+  @media print { .noprint { display: none; } .sheet { margin: 0; box-shadow: none; } }
+  @media screen { body { padding-top: 56px; background: #e9e9e9; } .sheet { box-shadow: 0 2px 20px rgba(0,0,0,.15); margin: 16px auto; } }
 </style>
 </head>
 <body>
-<div class="noprint">${isWa ? 'Hoja de RESPALDO: el QR abre WhatsApp directo, sin pasar por el sitio.' : 'Hoja lista para imprimir (tamaño carta). Papel mate; QR de al menos 8 cm.'} <button onclick="window.print()">Imprimir / Guardar PDF</button></div>
+<div class="noprint">${isWa ? 'Hoja de RESPALDO: el QR abre WhatsApp directo, sin pasar por el sitio.' : 'Hoja lista para imprimir (tamaño carta, sin márgenes). Papel mate; 3 copias.'} <button onclick="window.print()">Imprimir / Guardar PDF</button></div>
 <main class="sheet">
-  <div class="top">
-    <p class="eyebrow">${esc(p.eyebrow || 'Fisioterapia deportiva')}</p>
-    <h1>${esc(p.headline || person.name)}</h1>
-    <p class="sub">${esc(p.subline || person.title || '')}</p>
+  <div class="brand">
+    ${inlineSvg(brand.logo, { className: 'logo' })}
+    ${inlineSvg(brand.wordmark, { className: 'wordmark', label: person.title })}
+    <img class="firma" src="brand/firma-black.svg" alt="${esc(person.name)}">
   </div>
+  <p class="tagline">${esc(cfg.hero.headline)}</p>
+  ${p.hook ? `<p class="hook">${esc(p.hook)}</p>` : ''}
   <div class="qr" role="img" aria-label="Código QR">${svg}</div>
   <p class="scan">${esc(instruction)}<small>${esc(instructionSub)}</small></p>
   ${d.printPromoLine ? `<div class="promo">${esc(d.printPromoLine)}</div>` : ''}
   <div class="fallback">
-    ${esc(p.fallback_label || 'Si el QR no abre, escríbeme directo:')}
-    <b>${esc(d.phoneDisplay)}</b>
-    <p class="url">${esc(d.host)}</p>
+    <div><span class="lbl">${esc(contact.phone_label || 'Citas')} · ${esc(p.fallback_label || 'si el QR no abre')}</span><b>${esc(d.phoneDisplay)}</b></div>
+    <div class="right">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}<br><span class="url">${esc(d.host)}</span></div>
   </div>
-  <p class="foot">${esc(person.name)} · ${esc(person.title || '')}${person.cedula ? ` · Cédula profesional ${esc(person.cedula)}` : ''} · ${esc(person.city || '')}</p>
 </main>
 </body>
 </html>

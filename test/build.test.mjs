@@ -77,8 +77,13 @@ test('index.html: CTAs y metadatos esenciales', () => {
   for (const p of d.pains) assert.ok(html.includes(`href="${p.link}"`), `chip ${p.label}`);
   assert.ok(html.includes(`href="${d.waLinkPromo}"`), 'CTA de la promo con su mensaje');
   assert.ok(!/target="_blank"[^>]*wa\.me|wa\.me[^>]*target="_blank"/.test(html), 'wa.me sin target _blank: en móvil abre la app directo');
-  assert.ok(html.includes('$650') && html.includes('<s>$800</s>'), 'promo con precio y precio regular tachado');
-  assert.ok(html.includes('Sesión a domicilio: <b>$800</b>'), 'precio regular publicado en Así funciona');
+  assert.ok(html.includes('$650') && html.includes('<s class="num">$800</s>'), 'promo con precio y precio regular tachado');
+  assert.ok(html.includes('Sesión a domicilio: <b class="num">$800</b>'), 'precio regular publicado en Así funciona');
+  assert.ok(html.includes('442 550 0158'), 'el teléfono de la tarjeta impresa, tal cual');
+  assert.ok(html.includes('Rehabilitación integral a domicilio'), 'la frase de la tarjeta impresa');
+  assert.ok(html.includes('fonts/italiana-400.woff2') && html.includes('fonts/jost-var.woff2'), 'tipografías de la tarjeta autoalojadas');
+  assert.ok(html.includes('class="motif"') && html.includes('class="wordmark"') && html.includes('brand/firma-cream.svg'), 'logo, wordmark y firma de la tarjeta');
+  assert.ok(html.includes('#FBEEE6') && html.includes('#0A0A0A'), 'paleta crema y negro de la tarjeta');
   assert.ok(html.includes('id="copy-cedula"'), 'tocar la cédula la copia');
   assert.equal((html.match(/<section/g) || []).length, 5, 'hero + 5 secciones = 6 bloques');
   assert.ok(html.includes('data-until="2026-10-11"') || !cfg.promo.enabled, 'la promo lleva su fecha de vencimiento');
@@ -91,11 +96,14 @@ test('index.html: sin requests a terceros (salvo Umami si está configurado)', (
   const allowed = /^(https:\/\/wa\.me\/|https:\/\/instagram\.com\/|https:\/\/paola\.robertobh\.dev\/|https:\/\/stats\.robertobh\.dev\/|https:\/\/www\.cedulaprofesional\.sep\.gob\.mx\/)/;
   const bad = urls.filter((u) => !allowed.test(u));
   assert.deepEqual(bad, [], 'requests externos inesperados');
-  assert.ok(!/fonts\.googleapis|fonts\.gstatic|cdn\./.test(html), 'sin fuentes ni CDNs externos');
+  assert.ok(!/fonts\.googleapis|fonts\.gstatic|cdn\./.test(html), 'sin fuentes ni CDNs externos (las fuentes van autoalojadas)');
 });
 
-test('index.html: peso bajo para 3G en el cerro', () => {
+test('index.html: peso bajo para 3G en el cerro', async () => {
   assert.ok(result.indexBytes < 60 * 1024, `index.html pesa ${result.indexBytes} bytes`);
+  let total = result.indexBytes;
+  for (const f of ['fonts/italiana-400.woff2', 'fonts/jost-var.woff2', 'brand/firma-cream.svg']) total += (await readFile(path.join(outDir, f))).length;
+  assert.ok(total < 130 * 1024, `primera carga (html + fuentes + firma) pesa ${total} bytes`);
 });
 
 test('index.html: copy sin em-dashes ni placeholders sin resolver', () => {
@@ -111,6 +119,7 @@ test('imprimir.html: QR grande, número de respaldo y dominio', () => {
   assert.ok(print.includes(d.host));
   assert.ok(print.includes('$650'), 'la hoja anuncia la promo con precio');
   assert.ok(print.includes('11 de octubre'), 'fecha de vencimiento en formato largo');
+  assert.ok(print.includes('class="logo"') && print.includes('brand/firma-black.svg'), 'la hoja lleva el frente de la tarjeta');
 });
 
 test('imprimir-whatsapp.html: hoja de respaldo con QR directo a wa.me', async () => {
@@ -138,6 +147,9 @@ test('dist: archivos esperados', async () => {
   const files = await readdir(outDir);
   for (const f of ['index.html', 'imprimir.html', 'imprimir-whatsapp.html', '404.html', 'qr.svg', 'qr-print.svg', 'qr-print.png', 'qr-whatsapp.svg', 'qr-whatsapp.png', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', '.nojekyll', 'CNAME', d.vcfName, 'og.png', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) {
     assert.ok(files.includes(f), `falta ${f}`);
+  }
+  for (const f of ['fonts/italiana-400.woff2', 'fonts/jost-var.woff2', 'brand/logo-black.svg', 'brand/logo-cream.svg', 'brand/wordmark-black.svg', 'brand/firma-cream.svg', 'brand/firma-black.svg']) {
+    assert.ok((await readFile(path.join(outDir, f))).length > 500, `falta o está vacío ${f}`);
   }
   assert.equal((await readFile(path.join(outDir, 'CNAME'), 'utf8')).trim(), 'paola.robertobh.dev');
 });

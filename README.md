@@ -4,6 +4,11 @@ Tarjeta de presentación digital, 100 % móvil, para captar pacientes con un QR:
 sin frameworks que abre en un segundo con mala señal, con **WhatsApp como acción principal**,
 **Guardar contacto** (vCard) y un **modo "Mostrar QR"** para que Paola la enseñe desde su teléfono.
 
+La identidad es la de la tarjeta impresa (Canva): crema `#FBEEE6` y negro, el logo de columna, el
+wordmark "Fisioterapeuta" y la firma extraídos del PDF como vectores exactos (`public/brand/`), y las
+mismas tipografías, Italiana (títulos) y Jost (texto), autoalojadas en `public/fonts/`. El hero
+reproduce el reverso de la tarjeta (tagline, citas, zona y cédula); el pie, el frente.
+
 Dominio previsto: **https://paola.robertobh.dev** (subdominio de robertobh.dev).
 
 ## Estrategia en una hoja
@@ -22,8 +27,11 @@ Dominio previsto: **https://paola.robertobh.dev** (subdominio de robertobh.dev).
 
 Decisiones deliberadas:
 
-- **Solo modo claro.** Bajo el sol, un fondo blanco a brillo máximo se lee; el modo oscuro no.
-- **Cero dependencias en el navegador.** Sin fuentes web, sin CDN, sin JS externo. El HTML pesa ~24 KB y el QR va inline como SVG.
+- **Sin modo oscuro del sistema.** La página fija sus colores: el hero negro es el reverso de la tarjeta y el
+  resto va en crema, que a brillo máximo se lee bajo el sol.
+- **Cero requests a terceros.** Sin CDN ni JS externo; las dos fuentes van en el mismo dominio (37 KB en
+  total, con `font-display: swap`: el texto aparece antes de que carguen). El HTML pesa ~48 KB con el QR y
+  el logo inline.
 - **Registro de tú.** Público deportivo, trato directo.
 - **La cédula profesional visible.** En México es la señal de confianza número uno para un fisioterapeuta.
 - **Sin formulario.** En un cerro nadie llena formularios; WhatsApp es el formulario.
@@ -32,9 +40,9 @@ Decisiones deliberadas:
 
 Todo lo editable vive en **`card.config.json`**. Lo mínimo:
 
-1. `contact.whatsapp`: el número **con lada de país y sin "+"**, solo dígitos. Ejemplo: `524421234567`.
-   El build se niega a publicar con el marcador `52XXXXXXXXXX`: un QR impreso que lleva a un
-   WhatsApp inexistente es peor que no tener tarjeta.
+1. `contact.whatsapp`: ya está el número de la tarjeta (`524425500158`, se muestra como 442 550 0158).
+   Si cambia, va **con lada de país y sin "+"**, solo dígitos. El build se niega a publicar con un marcador
+   tipo `52XXXXXXXXXX`: un QR impreso que lleva a un WhatsApp inexistente es peor que no tener tarjeta.
 2. `promo`: Paola confirma `price` (propuesta $650), `regular_price` ($800) y `until` (propuesta
    2026-10-11, 14 días después de la carrera). Si no quiere promo: `"enabled": false`.
 3. `how.price`: el precio regular que se publica en "Así funciona" (vacío = no se muestra).
@@ -107,7 +115,10 @@ scripts/vcard.mjs       ← vCard 3.0 con escapes y plegado RFC
 scripts/qr.mjs          ← QR con parámetro ?src= para distinguir hoja vs. teléfono
 scripts/og.mjs          ← imagen Open Graph e íconos (Playwright)
 scripts/screenshots.mjs ← capturas móviles y PDF de la hoja
+public/brand/           ← logo, wordmark y firma (vectores exactos de la tarjeta impresa)
+public/fonts/           ← Italiana y Jost (woff2, subconjunto latín)
 public/                 ← estáticos que se copian tal cual (og.png, íconos, foto)
+scripts/brand.mjs       ← variantes de color de la marca, favicon
 deploy/                 ← nginx + script de alta en el VPS
 .github/workflows/      ← Pages (push a main) y VPS (manual)
 test/                   ← node:test

@@ -10,37 +10,37 @@
     }
   },
   "theme": {
-    "bg": "#FFFFFF",
-    "surface": "#F2F7F5",
-    "ink": "#0B1410",
-    "muted": "#3D4D48",
-    "line": "#C9D7D2",
-    "accent": "#0B5C56",
-    "whatsapp": "#075E54",
-    "whatsapp_active": "#05463F",
-    "promo": "#FFD84D",
-    "promo_ink": "#111111"
+    "cream": "#FBEEE6",
+    "black": "#0A0A0A",
+    "ink": "#0A0A0A",
+    "muted": "#4A423E",
+    "muted_on_dark": "#C9BFB8",
+    "line": "#0A0A0A",
+    "line_soft": "#D9CCC3",
+    "white": "#FFFFFF"
   },
   "person": {
     "name": "Paola García Moctezuma",
     "short_name": "Paola",
-    "initials": "PG",
-    "title": "Lic. en Fisioterapia",
-    "org": "Fisioterapia deportiva y a domicilio · Querétaro",
+    "title": "Fisioterapeuta",
+    "title_long": "Licenciada en Fisioterapia",
+    "org": "Fisioterapeuta · Rehabilitación integral a domicilio",
     "cedula": "15860222",
+    "cedula_label": "Céd. Prof.",
     "cedula_verify_url": "https://www.cedulaprofesional.sep.gob.mx/cedula/presidencia/indexAvanzada.action",
     "city": "Querétaro",
     "state": "Qro.",
     "country": "México",
-    "photo": "",
-    "vcard_note": "Fisioterapia deportiva, ortopédica y a domicilio en Querétaro. Nos conocimos en la carrera de MTB."
+    "zone": "Querétaro y zona metropolitana",
+    "vcard_note": "Fisioterapeuta. Rehabilitación integral a domicilio en Querétaro y zona metropolitana. Nos conocimos en la carrera de MTB."
   },
   "contact": {
-    "whatsapp": "52XXXXXXXXXX",
-    "phone_display": "",
+    "whatsapp": "524425500158",
+    "phone_display": "442 550 0158",
+    "phone_label": "Citas",
     "email": "",
     "instagram": "",
-    "vcard_filename": "paola-garcia-fisioterapia.vcf"
+    "vcard_filename": "paola-garcia-fisioterapeuta.vcf"
   },
   "whatsapp": {
     "greeting_event": "Hola Paola, te vi en la carrera de MTB.",
@@ -50,9 +50,8 @@
     "symptom_template": "Hola Paola, te vi en la carrera de MTB. Tengo molestia en {zona}. ¿Podemos agendar una sesión a domicilio?"
   },
   "hero": {
-    "headline": "Recupérate de la carrera sin salir de casa",
-    "sub": "Voy a tu casa con camilla y equipo. Valoración, masaje de descarga y rehabilitación de lesiones en Querétaro y zona metropolitana.",
-    "chips": ["A domicilio con equipo propio", "Certificada en punción seca", "1 año en el CRIT Teletón"]
+    "headline": "Rehabilitación integral a domicilio",
+    "sub": "Voy a tu casa con camilla y equipo. Valoración, masaje de descarga y rehabilitación de lesiones."
   },
   "cta": {
     "whatsapp": "Escríbeme por WhatsApp",
@@ -83,12 +82,30 @@
     "title": "¿Qué te duele?",
     "sub": "Toca lo que sientes y me lo cuentas por WhatsApp.",
     "items": [
-      { "label": "Rodilla y cadera al pedalear", "zone": "rodilla o cadera al pedalear" },
-      { "label": "Espalda baja y cuello", "zone": "espalda baja y cuello" },
-      { "label": "Manos y antebrazos dormidos", "zone": "manos y antebrazos" },
-      { "label": "Masaje de descarga post carrera", "message": "Hola Paola, te vi en la carrera de MTB. Quiero un masaje de descarga post carrera a domicilio. ¿Qué días tienes?" },
-      { "label": "Esguinces, caídas y tendinitis", "zone": "esguince, caída o tendinitis" },
-      { "label": "Columna y hernias", "zone": "columna" }
+      {
+        "label": "Rodilla y cadera al pedalear",
+        "zone": "rodilla o cadera al pedalear"
+      },
+      {
+        "label": "Espalda baja y cuello",
+        "zone": "espalda baja y cuello"
+      },
+      {
+        "label": "Manos y antebrazos dormidos",
+        "zone": "manos y antebrazos"
+      },
+      {
+        "label": "Masaje de descarga post carrera",
+        "message": "Hola Paola, te vi en la carrera de MTB. Quiero un masaje de descarga post carrera a domicilio. ¿Qué días tienes?"
+      },
+      {
+        "label": "Esguinces, caídas y tendinitis",
+        "zone": "esguince, caída o tendinitis"
+      },
+      {
+        "label": "Columna y hernias",
+        "zone": "columna"
+      }
     ],
     "note": "También atiendo post operatorio, fracturas y rehabilitación del adulto mayor (equilibrio y marcha)."
   },
@@ -122,7 +139,7 @@
     "disclaimer": "Esta página es informativa y no sustituye una valoración presencial."
   },
   "share": {
-    "text": "Fisio a domicilio en Querétaro. La vi en la carrera de MTB. Cédula profesional 15860222."
+    "text": "Fisioterapeuta a domicilio en Querétaro. La vi en la carrera de MTB. Céd. Prof. 15860222."
   },
   "qr_modal": {
     "title": "Escanea para abrir mi tarjeta",
@@ -130,16 +147,14 @@
     "brightness_toast": "Sube el brillo de tu pantalla al máximo"
   },
   "print": {
-    "eyebrow": "Fisioterapia a domicilio para ciclistas",
-    "headline": "¿Terminaste la rodada con dolor?",
-    "subline": "Paola García Moctezuma · Lic. en Fisioterapia · Cédula profesional 15860222 · Querétaro y zona metropolitana",
+    "hook": "¿Terminaste la rodada con dolor?",
     "instruction": "Escanea y escríbeme por WhatsApp",
     "instruction_sub": "Abre la cámara de tu celular y apúntala al código: se abre mi tarjeta y me escribes en un toque. También puedes guardar mi contacto.",
     "promo_line": "Promo de la carrera: primera sesión a domicilio a {price}. Válida hasta el {until}.",
-    "fallback_label": "Si el QR no abre, escríbeme directo:"
+    "fallback_label": "si el QR no abre, escríbeme directo"
   },
   "og": {
-    "title": "Paola García, Fisioterapia a domicilio en Querétaro",
-    "description": "Lic. en Fisioterapia, cédula profesional 15860222. Recuperación post carrera, lesiones y columna. Voy a tu casa con camilla y equipo. Escríbeme por WhatsApp."
+    "title": "Paola García Moctezuma · Fisioterapeuta a domicilio en Querétaro",
+    "description": "Rehabilitación integral a domicilio. Céd. Prof. 15860222. Recuperación post carrera, lesiones y columna. Citas por WhatsApp: 442 550 0158."
   }
 }

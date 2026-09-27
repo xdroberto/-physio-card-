@@ -7,7 +7,7 @@ export function render404({ cfg, d }) {
 <meta name="robots" content="noindex">
 <meta http-equiv="refresh" content="0; url=/">
 <title>${esc(cfg.person.name)}</title>
-<style>body{font-family:system-ui,-apple-system,sans-serif;padding:32px 16px;text-align:center;color:#1a1a1a}</style>
+<style>body{font-family:system-ui,-apple-system,sans-serif;padding:32px 16px;text-align:center;color:#0a0a0a;background:#FBEEE6}</style>
 </head><body><p>Esa página no existe. Te llevo a la tarjeta de ${esc(cfg.person.short_name || cfg.person.name)}…</p>
 <p><a href="/">${esc(d.host)}</a></p></body></html>
 `;
@@ -21,8 +21,8 @@ export function renderManifest({ cfg }) {
       description: cfg.og?.description || '',
       start_url: '/?src=inicio',
       display: 'standalone',
-      background_color: cfg.theme?.bg || '#ffffff',
-      theme_color: cfg.theme?.accent || '#0f766e',
+      background_color: cfg.theme?.cream || '#ffffff',
+      theme_color: cfg.theme?.black || '#0a0a0a',
       lang: 'es-MX',
       icons: [
         { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

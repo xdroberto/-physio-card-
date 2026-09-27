@@ -1,8 +1,10 @@
 import { esc, attr } from './html.mjs';
+import { inlineSvg } from './brand.mjs';
 
-// La tarjeta: una sola página móvil, seis secciones. Todo inline (CSS, SVG del QR, script
-// mínimo). Cero fuentes externas y cero requests de terceros, salvo la analítica si se configura.
-export function renderIndex({ cfg, d, svgScreen }) {
+// La tarjeta digital, con la identidad de la tarjeta impresa: crema #FBEEE6, negro, logo de
+// columna, wordmark "Fisioterapeuta" y firma como vectores exactos; Italiana para títulos y
+// Jost para texto, autoalojadas. Una sola página móvil de seis bloques.
+export function renderIndex({ cfg, d, svgScreen, brand }) {
   const { person, contact, hero, cta, trust, how, og, pains, qr_modal: qrm, contact_section: cs, theme: t } = cfg;
   const promo = d.promo;
   const umami = cfg.site.umami || {};
@@ -11,11 +13,10 @@ export function renderIndex({ cfg, d, svgScreen }) {
       ? `<script defer src="${attr(umami.src)}" data-website-id="${attr(umami.website_id)}" data-domains="${attr(d.host)}"></script>`
       : '';
 
-  const avatar = person.photo
-    ? `<img class="avatar" src="${attr(person.photo)}" width="60" height="60" alt="Foto de ${esc(person.name)}" loading="eager" decoding="async">`
-    : `<div class="avatar avatar--initials" aria-hidden="true">${esc(person.initials || person.name.slice(0, 1))}</div>`;
-
-  const chips = (hero.chips || []).map((c) => `<li>${esc(c)}</li>`).join('');
+  const wordmark = inlineSvg(brand.wordmark, { className: 'wordmark', label: person.title });
+  const motif = inlineSvg(brand.logo, { className: 'motif' });
+  const firmaImg = (cls, color) =>
+    `<img class="${cls}" src="brand/firma-${color}.svg" width="${brand.firma.w.toFixed(0)}" height="${brand.firma.h.toFixed(0)}" alt="${attr(person.name)}">`;
 
   const painChips = d.pains
     .map(
@@ -31,7 +32,7 @@ export function renderIndex({ cfg, d, svgScreen }) {
 
   const steps = (how.steps || []).map((s) => `<li>${esc(s)}</li>`).join('');
   const priceLine = how.price
-    ? `<p class="price"><span>${esc(how.price_label || 'Sesión a domicilio')}: <b>${esc(how.price)}</b></span>${how.price_note ? `<span class="price__note">${esc(how.price_note)}</span>` : ''}</p>`
+    ? `<p class="price"><span>${esc(how.price_label || 'Sesión a domicilio')}: <b class="num">${esc(how.price)}</b></span>${how.price_note ? `<span class="price__note">${esc(how.price_note)}</span>` : ''}</p>`
     : '';
 
   const channels = [
@@ -51,11 +52,11 @@ export function renderIndex({ cfg, d, svgScreen }) {
 
   const promoBlock = promo
     ? `<section class="promo" id="promo" aria-labelledby="promo-title" data-until="${attr(promo.until)}">
-        <p class="promo__eyebrow">${esc(promo.eyebrow)}</p>
+        <p class="eyebrow">${esc(promo.eyebrow)}</p>
         <h2 id="promo-title" class="promo__title">${esc(promo.title)}</h2>
-        <p class="promo__price"><b>${esc(promo.price)}</b> <s>${esc(promo.regular_price)}</s></p>
+        <p class="promo__price"><b class="num">${esc(promo.price)}</b> <s class="num">${esc(promo.regular_price)}</s></p>
         <p class="promo__text">${esc(promo.text)}</p>
-        <a class="btn btn--promo" href="${attr(d.waLinkPromo)}" data-umami-event="whatsapp-promo">${icon('whatsapp')}<span>${esc(promo.cta || cta.whatsapp)}</span></a>
+        <a class="btn btn--black" href="${attr(d.waLinkPromo)}" data-umami-event="whatsapp-promo">${icon('whatsapp')}<span>${esc(promo.cta || cta.whatsapp)}</span></a>
         ${promo.fine_print ? `<p class="promo__fine">${esc(promo.fine_print)}</p>` : ''}
       </section>`
     : '';
@@ -82,7 +83,7 @@ export function renderIndex({ cfg, d, svgScreen }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light only">
-<meta name="theme-color" content="${attr(t.bg)}">
+<meta name="theme-color" content="${attr(t.black)}">
 <title>${esc(og.title)}</title>
 <meta name="description" content="${attr(og.description)}">
 <link rel="canonical" href="${attr(d.baseUrl)}">
@@ -99,195 +100,223 @@ export function renderIndex({ cfg, d, svgScreen }) {
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/italiana-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jost-var.woff2" as="font" type="font/woff2" crossorigin>
 <script type="application/ld+json">${JSON.stringify(jsonLd(cfg, d))}</script>
 <style>
+@font-face{font-family:"Italiana";src:url(fonts/italiana-400.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Jost";src:url(fonts/jost-var.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 :root{
-  --bg:${t.bg};--surface:${t.surface};--ink:${t.ink};--muted:${t.muted};--line:${t.line};
-  --accent:${t.accent};--wa:${t.whatsapp};--wa-active:${t.whatsapp_active || t.whatsapp};
-  --promo:${t.promo};--promo-ink:${t.promo_ink};
-  --r:14px;--pad:18px;--maxw:520px;
+  --cream:${t.cream};--black:${t.black};--ink:${t.ink};--muted:${t.muted};--muted-dark:${t.muted_on_dark};
+  --line:${t.line};--line-soft:${t.line_soft};--white:${t.white};
+  --serif:"Italiana",Georgia,"Times New Roman",serif;
+  --sans:"Jost",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --r:12px;--maxw:520px;
   --safe-b:env(safe-area-inset-bottom,0px);
   color-scheme:light only;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased;padding-bottom:calc(88px + var(--safe-b))}
-a{color:var(--accent)}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;font-weight:400;-webkit-font-smoothing:antialiased;padding-bottom:calc(84px + var(--safe-b))}
+a{color:var(--ink)}
 img{max-width:100%;display:block}
 h1,h2,h3,p,ul,ol{margin:0}
 ul,ol{padding:0;list-style:none}
 button{font:inherit;color:inherit}
-b{font-weight:800}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+b{font-weight:600}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:6px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 .num{font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.serif{font-family:var(--serif);font-weight:400}
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase}
 
-/* ---------- Hero ---------- */
-.hero{padding:calc(12px + env(safe-area-inset-top,0px)) 0 4px}
-.who{display:grid;grid-template-columns:60px minmax(0,1fr) auto;gap:12px;align-items:center}
-.avatar{width:60px;height:60px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
-.avatar--initials{display:grid;place-items:center;background:var(--accent);color:#fff;font-weight:800;font-size:22px;letter-spacing:.02em}
-.name{font-size:22px;line-height:1.15;font-weight:800;letter-spacing:-.01em}
-.cred{font-size:14.5px;line-height:1.3;color:var(--muted);font-weight:600;margin-top:2px;white-space:nowrap}
-.qrpill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:2px solid var(--ink);background:var(--bg);font-weight:700;font-size:15px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+/* ---------- Hero: el reverso de la tarjeta ---------- */
+.hero{background:var(--black);color:var(--cream);position:relative;overflow:hidden}
+.hero .wrap{position:relative;padding-top:calc(22px + env(safe-area-inset-top,0px));padding-bottom:26px}
+.motif{position:absolute;right:-22%;top:-6%;width:78%;height:auto;color:var(--cream);opacity:.11;pointer-events:none}
+.hero__top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.brand{display:grid;gap:8px}
+.wordmark{width:196px;height:auto;color:var(--cream)}
+.firma{width:170px;height:auto}
+.qrpill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--cream);background:transparent;color:var(--cream);font-weight:500;font-size:15px;letter-spacing:.06em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;white-space:nowrap;flex:none}
 .qrpill svg{width:20px;height:20px}
-.headline{font-size:clamp(28px,7.5vw,34px);line-height:1.1;font-weight:800;letter-spacing:-.02em;margin:16px 0 8px;text-wrap:balance}
-.sub{font-size:17px;font-weight:500;color:var(--ink);text-wrap:pretty}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.chips li{font-size:14px;font-weight:700;padding:6px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink)}
-.actions{display:grid;gap:10px;margin:16px 0 0}
+.tagline{font-family:var(--serif);font-weight:400;font-size:clamp(38px,11vw,50px);line-height:1;letter-spacing:-.005em;margin:26px 0 12px;text-wrap:balance}
+.sub{font-size:17px;font-weight:300;line-height:1.45;color:var(--cream);text-wrap:pretty;max-width:34ch}
+.citas{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px;margin-top:22px}
+.citas__tel{text-decoration:none;color:var(--cream);display:grid;gap:0}
+.citas__lbl{font-size:13px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-dark)}
+.citas__num{font-size:30px;font-weight:300;line-height:1.1;letter-spacing:.01em}
+.zona{font-size:14.5px;font-weight:300;color:var(--muted-dark);line-height:1.4}
+@media (min-width:420px){.zona{text-align:right}}
+.actions{display:grid;gap:10px;margin-top:22px}
 .actions__row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
 /* ---------- Botones ---------- */
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 16px;border-radius:var(--r);font-weight:700;font-size:17px;line-height:1.15;text-decoration:none;border:2px solid var(--ink);background:var(--bg);color:var(--ink);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .08s ease,filter .08s ease,background .08s ease;cursor:pointer;text-align:center}
-.btn:active{transform:scale(.98);filter:brightness(.92)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 16px;border-radius:var(--r);font-family:var(--sans);font-weight:500;font-size:17px;line-height:1.15;letter-spacing:.01em;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .08s ease,filter .08s ease;cursor:pointer;text-align:center}
+.btn:active{transform:scale(.98);filter:brightness(.9)}
 .btn svg{width:24px;height:24px;flex:none}
-.btn--wa{background:var(--wa);color:#fff;border-color:#043F38;flex-direction:column;gap:2px;min-height:64px;font-size:20px}
-.btn--wa:active{background:var(--wa-active)}
-.btn--wa .btn__main{display:flex;align-items:center;gap:12px}
-.btn--wa .btn__main svg{width:28px;height:28px}
-.btn--wa .btn__sub{font-size:14px;font-weight:600;opacity:.95}
-.btn--wa.btn--row{flex-direction:row;font-size:18px;min-height:60px}
+.btn--cream{background:var(--cream);color:var(--black);border-color:var(--cream);flex-direction:column;gap:1px;min-height:64px;font-size:19px;font-weight:500}
+.btn--cream .btn__main{display:flex;align-items:center;gap:12px}
+.btn--cream .btn__main svg{width:28px;height:28px}
+.btn--cream .btn__sub{font-size:13.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.btn--outline-cream{border-color:var(--cream);color:var(--cream)}
+.btn--black{background:var(--black);color:var(--cream);border-color:var(--black);min-height:58px;font-size:18px}
+.btn--black:active{filter:brightness(1.3)}
 .btn--outline{font-size:16px;min-height:52px}
-.btn--outline svg{color:var(--accent)}
-.btn--promo{background:var(--promo-ink);color:var(--promo);border-color:var(--promo-ink);min-height:56px;margin-top:12px}
-.btn--promo svg{color:var(--promo)}
 
-/* ---------- Secciones ---------- */
-section{margin-top:20px}
-.card{background:var(--bg);border:2px solid var(--line);border-radius:var(--r);padding:var(--pad)}
-.h2{font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
-.card__sub{font-size:16px;color:var(--muted);font-weight:500;margin:0 0 14px}
-.promo{background:var(--promo);color:var(--promo-ink);border:3px solid var(--promo-ink);border-radius:16px;padding:var(--pad)}
+/* ---------- Secciones (crema, estilo editorial) ---------- */
+section{padding:26px 0 8px}
+section+section{border-top:1px solid var(--line-soft)}
+.h2{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.05;margin-bottom:8px}
+.lead{font-size:16px;font-weight:300;color:var(--muted);margin:0 0 16px;max-width:38ch}
+.promo{border:1.5px solid var(--ink);border-radius:16px;padding:20px 18px 18px;margin-top:22px}
 .promo[hidden]{display:none}
-.promo__eyebrow{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.promo__title{font-size:20px;font-weight:800;line-height:1.2;margin:4px 0 2px}
-.promo__price{display:flex;align-items:baseline;gap:10px;margin:2px 0 8px}
-.promo__price b{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1}
-.promo__price s{font-size:18px;font-weight:600;opacity:.8}
-.promo__text{font-size:16px;font-weight:500}
-.promo__fine{font-size:14px;font-weight:600;margin-top:10px}
+.promo__title{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.05;margin:6px 0 4px}
+.promo__price{display:flex;align-items:baseline;gap:12px;margin:4px 0 8px}
+.promo__price b{font-family:var(--serif);font-weight:400;font-size:52px;line-height:1}
+.promo__price s{font-size:20px;font-weight:300;color:var(--muted)}
+.promo__text{font-size:16px;font-weight:400}
+.promo .btn{margin-top:14px}
+.promo__fine{font-size:13.5px;font-weight:400;color:var(--muted);margin-top:10px}
 .pains{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pain{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:56px;padding:10px 12px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:15.5px;line-height:1.2;text-decoration:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.pain:active{filter:brightness(.94)}
-.pain svg{width:18px;height:18px;flex:none;color:var(--wa)}
-.pains__note{font-size:15px;color:var(--muted);font-weight:500;margin-top:12px}
-.trust__intro{font-size:17px;font-weight:500;margin-bottom:12px}
-.cedula-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);margin-bottom:12px}
-.cedula-row .lbl{font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.cedula-copy{font-size:20px;font-weight:800;background:none;border:0;padding:6px 8px;border-radius:8px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:6px;min-height:40px}
-.cedula-copy svg{width:18px;height:18px;color:var(--accent)}
+.pain{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px;padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:500;font-size:15.5px;line-height:1.2;text-decoration:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pain:active{background:var(--black);color:var(--cream)}
+.pain svg{width:18px;height:18px;flex:none}
+.pains__note{font-size:15px;font-weight:300;color:var(--muted);margin-top:14px}
+.trust__intro{font-size:17px;font-weight:400;margin-bottom:14px}
+.cedula-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1.5px solid var(--ink);border-radius:var(--r);margin-bottom:14px}
+.cedula-row .lbl{font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cedula-copy{font-family:var(--sans);font-size:24px;font-weight:300;background:none;border:0;padding:4px 6px;border-radius:8px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:8px;min-height:40px}
+.cedula-copy svg{width:18px;height:18px}
 .checks{display:grid;gap:10px}
-.checks li{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;font-size:17px;font-weight:600}
-.checks svg{width:24px;height:24px;color:var(--accent);margin-top:1px}
-.verify{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-weight:600;font-size:15px;min-height:44px}
+.checks li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:16.5px;font-weight:400}
+.checks svg{width:22px;height:22px;margin-top:2px}
+.verify{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-weight:500;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:3px}
 .verify svg{width:16px;height:16px}
-.steps{display:grid;gap:12px;counter-reset:s}
-.steps li{position:relative;padding-left:48px;counter-increment:s;font-size:17px;font-weight:500;min-height:36px}
-.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:18px}
-.price{display:grid;gap:2px;margin-top:14px;font-size:18px;font-weight:700}
-.price b{font-variant-numeric:tabular-nums}
-.price__note{font-size:15px;font-weight:500;color:var(--muted)}
-.how .btn--wa{margin-top:14px}
-.save-help{font-size:14px;font-weight:600;color:var(--muted);margin:8px 0 12px}
-.phone{font-size:22px;font-weight:800;margin:0 0 14px;user-select:all;-webkit-user-select:all}
+.steps{display:grid;gap:14px;counter-reset:s}
+.steps li{position:relative;padding-left:46px;counter-increment:s;font-size:17px;font-weight:400;min-height:36px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-6px;font-family:var(--serif);font-size:36px;line-height:1;color:var(--ink)}
+.price{display:grid;gap:2px;margin-top:16px;font-size:18px;font-weight:500}
+.price__note{font-size:15px;font-weight:300;color:var(--muted)}
+.how .btn{margin-top:16px}
+.save-help{font-size:14px;font-weight:300;color:var(--muted);margin:8px 0 12px}
+.phone{font-size:30px;font-weight:300;margin:0 0 14px;user-select:all;-webkit-user-select:all}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.legal{margin-top:18px;font-size:14px;font-weight:600;color:var(--muted);display:grid;gap:6px}
-.legal .host{color:var(--accent)}
+.legal{margin-top:20px;font-size:14px;font-weight:300;color:var(--muted);display:grid;gap:6px}
+.legal .host{font-weight:500;color:var(--ink)}
+
+/* ---------- Pie: el frente de la tarjeta ---------- */
+.front{border-top:1px solid var(--line-soft);margin-top:20px;padding:34px 20px 20px;text-align:center;display:grid;justify-items:center;gap:14px}
+.front .logo{width:96px;height:auto}
+.front .wordmark{width:210px;height:auto}
+.front .firma{width:190px}
 
 /* ---------- Barra fija ---------- */
-.sticky{position:fixed;left:0;right:0;bottom:0;padding:8px 16px calc(8px + var(--safe-b));background:var(--bg);border-top:1px solid var(--line);transform:translateY(110%);transition:transform .15s ease;z-index:20}
+.sticky{position:fixed;left:0;right:0;bottom:0;padding:8px 16px calc(8px + var(--safe-b));background:var(--black);transform:translateY(110%);transition:transform .15s ease;z-index:20}
 .sticky.is-on{transform:none}
-.sticky .btn--wa{max-width:var(--maxw);margin:0 auto;min-height:56px}
+.sticky .btn--cream{max-width:var(--maxw);margin:0 auto;min-height:56px;flex-direction:row;gap:10px;font-size:18px}
 
 /* ---------- QR ---------- */
-dialog.qr{border:0;padding:0;background:#fff;color:var(--ink);width:min(100vw,560px);max-width:100vw;height:100dvh;max-height:100dvh;margin:0 auto}
-dialog.qr::backdrop{background:#fff}
+dialog.qr{border:0;padding:0;background:var(--cream);color:var(--ink);width:min(100vw,560px);max-width:100vw;height:100dvh;max-height:100dvh;margin:0 auto}
+dialog.qr::backdrop{background:var(--cream)}
 .qr__inner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px 20px calc(24px + var(--safe-b));text-align:center;gap:12px}
-.qr__title{font-size:22px;font-weight:800;padding:0 56px}
-.qr__code{width:min(88vw,60dvh,440px);height:auto}
+.qr__title{font-family:var(--serif);font-size:30px;line-height:1.05;padding:0 56px}
+.qr__code{width:min(86vw,58dvh,420px);height:auto;background:var(--white);border-radius:16px;padding:12px}
 .qr__code svg{width:100%;height:auto;display:block}
-.qr__name{font-size:17px;font-weight:700}
-.qr__hint{font-size:16px;font-weight:500;color:var(--muted);max-width:34ch}
-.qr__url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;color:var(--accent);font-size:16px}
-.qr__close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:56px;height:56px;border-radius:50%;border:2px solid var(--ink);background:#fff;font-size:28px;line-height:1;color:var(--ink);cursor:pointer;touch-action:manipulation}
+.qr__brand{display:grid;justify-items:center;gap:8px}
+.qr__brand .wordmark{width:150px;height:auto}
+.qr__brand .firma{width:150px}
+.qr__hint{font-size:15.5px;font-weight:300;color:var(--muted);max-width:34ch}
+.qr__url{font-weight:500;font-size:16px;letter-spacing:.02em}
+.qr__close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:56px;height:56px;border-radius:50%;border:1.5px solid var(--ink);background:var(--cream);font-size:28px;line-height:1;color:var(--ink);cursor:pointer;touch-action:manipulation}
 
 /* ---------- Toast ---------- */
-.toast{position:fixed;left:50%;bottom:calc(92px + var(--safe-b));transform:translate(-50%,20px);background:var(--ink);color:#fff;font-weight:700;font-size:15px;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:40;max-width:calc(100vw - 32px);text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(88px + var(--safe-b));transform:translate(-50%,20px);background:var(--black);color:var(--cream);font-weight:500;font-size:15px;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:40;max-width:calc(100vw - 32px);text-align:center}
 .toast.is-on{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media (min-width:600px){.hero{padding-top:32px}}
+@media (min-width:600px){.hero .wrap{padding-top:40px}}
 @media print{.sticky,.toast,.qrpill{display:none}}
 </style>
 </head>
 <body>
-<main class="wrap" id="top">
-  <header class="hero">
-    <div class="who">
-      ${avatar}
-      <div class="who__txt">
-        <p class="name">${esc(person.name)}</p>
-        <p class="cred">${esc(person.title)}${person.cedula ? `<br>Cédula profesional <span class="num">${esc(person.cedula)}</span>` : ''}</p>
+<header class="hero">
+  ${motif}
+  <div class="wrap">
+    <div class="hero__top">
+      <div class="brand">
+        ${wordmark}
+        ${firmaImg('firma', 'cream')}
       </div>
       <button class="qrpill" type="button" id="open-qr" data-umami-event="qr-abrir" aria-label="${attr(cta.qr)}">${icon('qr')}<span>QR</span></button>
     </div>
-    <h1 class="headline">${esc(hero.headline)}</h1>
+    <h1 class="tagline">${esc(hero.headline)}</h1>
     <p class="sub">${esc(hero.sub)}</p>
-    ${chips ? `<ul class="chips" aria-label="Datos clave">${chips}</ul>` : ''}
+    <div class="citas">
+      <a class="citas__tel" href="${attr(d.telLink)}" data-umami-event="llamar-hero"><span class="citas__lbl">${esc(contact.phone_label || 'Citas')}</span><span class="citas__num num">${esc(d.phoneDisplay)}</span></a>
+      <p class="zona">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} <span class="num">${esc(person.cedula)}</span></p>
+    </div>
     <nav class="actions" aria-label="Contacto directo">
-      <a id="cta-wa" class="btn btn--wa" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-hero">
+      <a id="cta-wa" class="btn btn--cream" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-hero">
         <span class="btn__main">${icon('whatsapp')}<span>${esc(cta.whatsapp)}</span></span>
         <span class="btn__sub">${esc(cta.whatsapp_sub)}</span>
       </a>
       <div class="actions__row">
-        <a class="btn btn--outline" href="${attr(d.vcfName)}" download data-umami-event="vcard-hero">${icon('contact')}<span>${esc(cta.save)}</span></a>
-        <a class="btn btn--outline" href="${attr(d.telLink)}" data-umami-event="llamar-hero">${icon('phone')}<span>${esc(cta.call)}</span></a>
+        <a class="btn btn--outline-cream" href="${attr(d.vcfName)}" download data-umami-event="vcard-hero">${icon('contact')}<span>${esc(cta.save)}</span></a>
+        <a class="btn btn--outline-cream" href="${attr(d.telLink)}" data-umami-event="llamar-hero-btn">${icon('phone')}<span>${esc(cta.call)}</span></a>
       </div>
     </nav>
-  </header>
+  </div>
+</header>
 
+<main class="wrap" id="top">
   ${promoBlock}
 
-  <section class="card" aria-labelledby="pain-title">
+  <section aria-labelledby="pain-title">
     <h2 class="h2" id="pain-title">${esc(pains.title)}</h2>
-    <p class="card__sub">${esc(pains.sub || '')}</p>
+    <p class="lead">${esc(pains.sub || '')}</p>
     <div class="pains">${painChips}</div>
     ${pains.note ? `<p class="pains__note">${esc(pains.note)}</p>` : ''}
   </section>
 
-  <section class="card" aria-labelledby="trust-title">
+  <section aria-labelledby="trust-title">
     <h2 class="h2" id="trust-title">${esc(trust.title)}</h2>
     ${trust.intro ? `<p class="trust__intro">${esc(trust.intro)}</p>` : ''}
-    ${person.cedula ? `<div class="cedula-row"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button><span class="lbl">${esc(person.title)}</span></div>` : ''}
+    ${person.cedula ? `<div class="cedula-row"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button><span class="lbl">${esc(person.title_long || person.title)}</span></div>` : ''}
     <ul class="checks">${trustItems}</ul>
     ${verify}
   </section>
 
-  <section class="card how" aria-labelledby="how-title">
+  <section class="how" aria-labelledby="how-title">
     <h2 class="h2" id="how-title">${esc(how.title)}</h2>
     <ol class="steps">${steps}</ol>
     ${priceLine}
-    <a id="cta-wa-2" class="btn btn--wa btn--row" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-how">${icon('whatsapp')}<span>${esc(cta.whatsapp_how || cta.whatsapp)}</span></a>
+    <a id="cta-wa-2" class="btn btn--black" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-how">${icon('whatsapp')}<span>${esc(cta.whatsapp_how || cta.whatsapp)}</span></a>
   </section>
 
-  <section class="card" aria-labelledby="contact-title" id="contacto">
+  <section aria-labelledby="contact-title" id="contacto">
     <h2 class="h2" id="contact-title">${esc(cs.title)}</h2>
-    <p class="card__sub">${esc(cs.sub || '')}</p>
-    <a class="btn btn--outline" href="${attr(d.vcfName)}" download data-umami-event="vcard-contacto">${icon('contact')}<span>${esc(cta.save)}</span></a>
+    <p class="lead">${esc(cs.sub || '')}</p>
+    <a class="btn btn--black" href="${attr(d.vcfName)}" download data-umami-event="vcard-contacto">${icon('contact')}<span>${esc(cta.save)}</span></a>
     <p class="save-help">${esc(cta.save_help || '')}</p>
     <p class="phone num" id="phone">${esc(d.phoneDisplay)}</p>
     <div class="grid2">${channels}</div>
     <div class="legal">
       <p>${esc(cs.coverage)}</p>
-      <p>${esc(person.name)}. ${esc(person.title)}.${person.cedula ? ` Cédula profesional ${esc(person.cedula)}.` : ''}</p>
+      <p>${esc(person.name)}. ${esc(person.title_long || person.title)}.${person.cedula ? ` Cédula profesional ${esc(person.cedula)}.` : ''}</p>
       ${cs.disclaimer ? `<p>${esc(cs.disclaimer)}</p>` : ''}
       <p class="host">${esc(d.host)}</p>
     </div>
   </section>
 </main>
 
+<footer class="front" aria-label="Marca">
+  <img class="logo" src="brand/logo-black.svg" width="${brand.logo.w.toFixed(0)}" height="${brand.logo.h.toFixed(0)}" alt="" loading="lazy">
+  <img class="wordmark" src="brand/wordmark-black.svg" width="${brand.wordmark.w.toFixed(0)}" height="${brand.wordmark.h.toFixed(0)}" alt="${attr(person.title)}" loading="lazy">
+  ${firmaImg('firma', 'black')}
+</footer>
+
 <div class="sticky" id="sticky" aria-hidden="true">
-  <a class="btn btn--wa btn--row" href="${attr(d.waLink)}" data-wa="main" tabindex="-1" data-umami-event="whatsapp-sticky">${icon('whatsapp')}<span>${esc(cta.whatsapp)}</span></a>
+  <a class="btn btn--cream" href="${attr(d.waLink)}" data-wa="main" tabindex="-1" data-umami-event="whatsapp-sticky">${icon('whatsapp')}<span>${esc(cta.whatsapp)}</span></a>
 </div>
 
 <dialog class="qr" id="qr" aria-labelledby="qr-title">
@@ -295,7 +324,7 @@ dialog.qr::backdrop{background:#fff}
     <button class="qr__close" type="button" id="close-qr" aria-label="Cerrar">×</button>
     <p class="qr__title" id="qr-title">${esc(qrm?.title || 'Escanea para abrir mi tarjeta')}</p>
     <div class="qr__code" role="img" aria-label="Código QR de esta tarjeta">${svgScreen}</div>
-    <p class="qr__name">${esc(person.short_name || person.name)} · Fisioterapia</p>
+    <div class="qr__brand"><img class="wordmark" src="brand/wordmark-black.svg" width="${brand.wordmark.w.toFixed(0)}" height="${brand.wordmark.h.toFixed(0)}" alt="${attr(person.title)}">${firmaImg('firma', 'black')}</div>
     <p class="qr__hint">${esc(qrm?.hint || '')}</p>
     <p class="qr__url">${esc(d.host)}</p>
   </div>
@@ -369,7 +398,7 @@ dialog.qr::backdrop{background:#fff}
     else{ copy(C.shareUrl,C.linkCopied); }
   });
 
-  /* Barra fija: solo cuando ningún botón verde está en pantalla y ya se pasó el del hero. */
+  /* Barra fija: solo cuando ningún botón principal está en pantalla y ya se pasó el del hero. */
   var sticky=$('sticky'),greens=[$('cta-wa'),$('cta-wa-2')],vis={};
   if('IntersectionObserver' in window){
     var io=new IntersectionObserver(function(entries){
@@ -393,13 +422,13 @@ function jsonLd(cfg, d) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Physiotherapy',
-    name: `${person.name} · Fisioterapia`,
+    name: `${person.name} · ${person.title}`,
     url: d.baseUrl,
     telephone: `+${contact.whatsapp}`,
     ...(contact.email ? { email: contact.email } : {}),
     areaServed: { '@type': 'City', name: person.city },
     address: { '@type': 'PostalAddress', addressLocality: person.city, addressRegion: person.state, addressCountry: 'MX' },
-    founder: { '@type': 'Person', name: person.name, jobTitle: person.title },
+    founder: { '@type': 'Person', name: person.name, jobTitle: person.title_long || person.title },
     sameAs: contact.instagram ? [`https://instagram.com/${contact.instagram.replace(/^@/, '')}`] : [],
   };
 }
@@ -419,7 +448,7 @@ function icon(name) {
     copy: '<path d="M8 2h11a1 1 0 0 1 1 1v13h-2V4H8V2zM4 6h11a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zm1 2v12h9V8H5z" fill="currentColor"/>',
     share:
       '<path d="M18 16a3 3 0 0 0-2.4 1.2l-7-4a3 3 0 0 0 0-2.4l7-4A3 3 0 1 0 15 5c0 .2 0 .4.1.6l-7 4a3 3 0 1 0 0 4.8l7 4A3 3 0 1 0 18 16z" fill="currentColor"/>',
-    check: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.6 14.6-4-4 1.4-1.4 2.6 2.6 5.8-5.8 1.4 1.4-7.2 7.2z" fill="currentColor"/>',
+    check: '<path d="M9.5 16.2 5.3 12l1.4-1.4 2.8 2.8 7.8-7.8 1.4 1.4z" fill="currentColor"/>',
     external: '<path d="M14 3h7v7h-2V6.4l-8.3 8.3-1.4-1.4L17.6 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" fill="currentColor"/>',
   }[name];
   return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${p}</svg>`;

@@ -9,6 +9,7 @@ import { qrUrl, qrSvg, qrPng } from './qr.mjs';
 import { renderIndex } from './render-index.mjs';
 import { renderPrint } from './render-print.mjs';
 import { render404, renderManifest, renderRobots, renderSitemap } from './render-misc.mjs';
+import { loadBrand, writeBrandVariants, faviconSvg } from './brand.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -127,7 +128,8 @@ export async function build({ allowPlaceholders = process.env.ALLOW_PLACEHOLDERS
   const svgWa = await qrSvg(d.waLink, { ecl: 'M', margin: 4 });
   const pngWa = await qrPng(d.waLink, { ecl: 'M', margin: 4, width: 1600 });
 
-  const ctx = { cfg, d, svgScreen, svgPrint, svgWa };
+  const brand = await loadBrand(PUBLIC);
+  const ctx = { cfg, d, svgScreen, svgPrint, svgWa, brand };
   await writeFile(path.join(outDir, 'index.html'), renderIndex(ctx));
   await writeFile(path.join(outDir, 'imprimir.html'), renderPrint(ctx, { mode: 'site' }));
   await writeFile(path.join(outDir, 'imprimir-whatsapp.html'), renderPrint(ctx, { mode: 'wa' }));
@@ -145,6 +147,8 @@ export async function build({ allowPlaceholders = process.env.ALLOW_PLACEHOLDERS
   if (cfg.site.github_pages_cname) await writeFile(path.join(outDir, 'CNAME'), d.host + '\n');
 
   if (existsSync(PUBLIC)) await cp(PUBLIC, outDir, { recursive: true });
+  await writeBrandVariants(brand, outDir, { black: cfg.theme.black, cream: cfg.theme.cream });
+  await writeFile(path.join(outDir, 'favicon.svg'), faviconSvg(brand, { cream: cfg.theme.cream, black: cfg.theme.black }));
 
   const size = (await stat(path.join(outDir, 'index.html'))).size;
   return { cfg, d, indexBytes: size, problems };
