@@ -15,7 +15,6 @@
     "ink": "#0A0A0A",
     "muted": "#4A423E",
     "muted_on_dark": "#C9BFB8",
-    "line": "#0A0A0A",
     "line_soft": "#D9CCC3",
     "white": "#FFFFFF"
   },
@@ -24,7 +23,7 @@
     "short_name": "Paola",
     "title": "Fisioterapeuta",
     "title_long": "Licenciada en Fisioterapia",
-    "org": "Fisioterapeuta · Rehabilitación integral a domicilio",
+    "org": "Rehabilitación integral a domicilio",
     "cedula": "15860222",
     "cedula_label": "Céd. Prof.",
     "cedula_verify_url": "https://www.cedulaprofesional.sep.gob.mx/cedula/presidencia/indexAvanzada.action",
@@ -33,7 +32,11 @@
     "country": "México",
     "zone": "Querétaro, zona metropolitana y San José Iturbide",
     "vcard_note": "Fisioterapeuta. Rehabilitación integral a domicilio en Querétaro y San José Iturbide. Contacto de la carrera de MTB.",
-    "zone_short": "Querétaro y San José Iturbide"
+    "zone_short": "Querétaro y San José Iturbide",
+    "area_served": [
+      "Querétaro",
+      "San José Iturbide"
+    ]
   },
   "contact": {
     "whatsapp": "524425500158",
@@ -113,11 +116,11 @@
     "title": "Licenciada en Fisioterapia",
     "facts": [
       {
-        "value": "4 años",
+        "value": "Cuatro años",
         "label": "de práctica clínica"
       },
       {
-        "value": "1 año",
+        "value": "Un año",
         "label": "en el CRIT Teletón"
       },
       {
@@ -126,7 +129,7 @@
       },
       {
         "value": "Kinesiotape",
-        "label": "terapia manual y electroterapia"
+        "label": "además de terapia manual y electroterapia"
       }
     ],
     "verify_label": "Verificar en la SEP"

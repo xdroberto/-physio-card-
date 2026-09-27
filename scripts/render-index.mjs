@@ -20,7 +20,7 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
 
   const painChips = d.pains
     .map(
-      (p) => `<a class="pain" href="${attr(p.link)}" data-umami-event="whatsapp-chip" data-umami-event-zona="${attr(p.label)}"><span>${esc(p.label)}</span>${icon('whatsapp')}</a>`,
+      (p) => `<a class="pain" href="${attr(p.link)}" data-umami-event="whatsapp-chip" data-umami-event-zona="${attr(p.label)}"><span>${esc(p.label)}<span class="sr-only">: escribir por WhatsApp</span></span>${icon('whatsapp')}</a>`,
     )
     .join('');
 
@@ -31,7 +31,7 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
       : '';
 
   const priceLine = how.price
-    ? `<p class="price"><span>${esc(how.price_label || 'Sesión a domicilio')}: <b class="num">${esc(how.price)}</b></span>${how.price_note ? `<span class="price__note">${esc(how.price_note)}</span>` : ''}</p>`
+    ? `<h3 class="sr-only">Tarifa</h3><p class="price"><span class="lbl">${esc(how.price_label || 'Sesión a domicilio')}</span><b class="num">${esc(how.price)}</b>${how.price_note ? `<span class="price__note">${esc(how.price_note)}</span>` : ''}</p>`
     : '';
 
   const channels = [
@@ -105,7 +105,7 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
 @font-face{font-family:"Jost";src:url(fonts/jost-var.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 :root{
   --cream:${t.cream};--black:${t.black};--ink:${t.ink};--muted:${t.muted};--muted-dark:${t.muted_on_dark};
-  --line:${t.line};--line-soft:${t.line_soft};--white:${t.white};
+  --line-soft:${t.line_soft};--white:${t.white};
   --serif:"Italiana",Georgia,"Times New Roman",serif;
   --sans:"Jost",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --r:12px;--maxw:520px;
@@ -142,7 +142,7 @@ b{font-weight:600}
 .tagline{font-family:var(--serif);font-weight:400;font-size:clamp(38px,11vw,50px);line-height:1;letter-spacing:-.005em;margin:24px 0 10px;text-wrap:balance}
 .sub{font-size:16.5px;font-weight:300;line-height:1.4;color:var(--cream);text-wrap:pretty;max-width:34ch}
 .meta{display:grid;gap:6px;margin-top:20px}
-.meta__tel{text-decoration:none;color:var(--cream);display:flex;align-items:baseline;gap:10px;font-size:28px;font-weight:300;line-height:1.1}
+.meta__tel{text-decoration:none;color:var(--cream);display:flex;align-items:baseline;gap:10px;font-size:28px;font-weight:300;line-height:1.1;padding:7px 0;margin:-7px 0}
 .meta__lbl{font-size:12px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dark)}
 .zona{font-size:14.5px;font-weight:400;color:var(--muted-dark);line-height:1.4;display:flex;flex-wrap:wrap;gap:0 14px}
 .zona span{white-space:nowrap}
@@ -164,6 +164,7 @@ b{font-weight:600}
 /* ---------- Secciones (crema, estilo editorial) ---------- */
 section{padding:30px 0 12px}
 section+section{border-top:1px solid var(--line-soft)}
+.promo+section{border-top:0}
 .h2{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.05;margin-bottom:12px}
 .lead{font-size:15.5px;font-weight:300;color:var(--muted);margin:-4px 0 14px;max-width:38ch}
 .promo{border:1.5px solid var(--ink);border-radius:16px;padding:20px 18px 18px;margin-top:24px}
@@ -179,19 +180,19 @@ section+section{border-top:1px solid var(--line-soft)}
 .pain:active{background:var(--black);color:var(--cream)}
 .pain svg{width:22px;height:22px;flex:none}
 .pains__note{font-size:14.5px;font-weight:300;color:var(--muted);margin-top:12px}
-.cedula-row{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding:8px 0 10px;border-bottom:1px solid var(--line-soft);margin-bottom:16px}
+.cedula-row{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding:8px 0 10px;margin-bottom:16px}
 .cedula-row__main{display:grid;gap:0}
-.cedula-row .lbl{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.cedula-copy{font-family:var(--sans);font-size:24px;font-weight:300;background:none;border:0;padding:2px 0;border-radius:8px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:8px;min-height:36px}
+.lbl{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cedula-copy{font-family:var(--sans);font-size:24px;font-weight:300;background:none;border:0;padding:0;border-radius:8px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:8px;min-height:44px}
 .cedula-copy svg{width:18px;height:18px}
 .facts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 12px}
-.facts li{display:grid;gap:2px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.facts li{display:grid;gap:2px;align-content:start;padding-top:10px;border-top:1px solid var(--line-soft)}
 .fact__v{font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.05;letter-spacing:-.005em}
 .fact__l{font-size:13.5px;font-weight:300;color:var(--muted);line-height:1.3}
 .verify{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-weight:500;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:3px;flex:none}
 .verify svg{width:16px;height:16px}
-.price{display:grid;gap:4px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:16px;font-weight:500}
-.price .num{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1;letter-spacing:0;margin-left:4px}
+.price{display:grid;gap:2px;margin-top:24px}
+.price .num{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1;letter-spacing:0}
 .price__note{font-size:14px;font-weight:300;color:var(--muted)}
 .trust .btn--black{margin-top:16px}
 .save-help{font-size:14px;font-weight:300;color:var(--muted);margin:8px 0 14px}
@@ -217,8 +218,8 @@ dialog:not([open]){display:none}
 body:has(dialog[open]){overflow:hidden}
 dialog.qr::backdrop{background:var(--cream)}
 .qr__inner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:24px 20px calc(24px + var(--safe-b));text-align:center;gap:12px}
-.qr__title{font-family:var(--serif);font-size:30px;line-height:1.05;padding:0 56px}
-.qr__code{width:min(86vw,50dvh,420px);height:auto;background:var(--white);border-radius:16px;padding:12px}
+.qr__title{font-family:var(--serif);font-size:clamp(24px,8vw,30px);line-height:1.05;padding:0 56px}
+.qr__code{width:min(86vw,44dvh,420px);height:auto;background:var(--white);border-radius:16px;padding:12px}
 .qr__code svg{width:100%;height:auto;display:block}
 .qr__brand{display:grid;justify-items:center;gap:8px}
 .qr__brand .wordmark{width:150px;height:auto}
@@ -232,6 +233,7 @@ dialog.qr::backdrop{background:var(--cream)}
 .toast.is-on{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (min-width:600px){.hero .wrap{padding-top:40px}}
+@media (max-width:340px){.tagline{margin:16px 0 8px}.meta{margin-top:14px}.actions{margin-top:16px}.hero .wrap{padding-bottom:20px}}
 @media print{.sticky,.toast,.qrpill{display:none}}
 </style>
 <noscript><style>#open-qr,#copy-num,#share,#copy-cedula svg{display:none}</style></noscript>
@@ -263,7 +265,7 @@ dialog.qr::backdrop{background:var(--cream)}
   </div>
 </header>
 
-<main class="wrap" id="top">
+<main class="wrap">
   ${promoBlock}
 
   <section aria-labelledby="pain-title">
@@ -278,12 +280,11 @@ dialog.qr::backdrop{background:var(--cream)}
     ${person.cedula ? `<div class="cedula-row"><div class="cedula-row__main"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" aria-label="Copiar cédula profesional ${attr(person.cedula)}" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button></div>${verify}</div>` : ''}
     ${facts ? `<ul class="facts">${facts}</ul>` : ''}
     ${priceLine}
-    <a id="cta-wa-2" class="btn btn--black" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-how">${icon('whatsapp')}<span>${esc(cta.whatsapp_how || cta.whatsapp)}</span></a>
+    <a id="cta-wa-2" class="btn btn--black" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-trust">${icon('whatsapp')}<span>${esc(cta.whatsapp_how || cta.whatsapp)}</span></a>
   </section>
 
   <section aria-labelledby="contact-title" id="contacto">
     <h2 class="h2" id="contact-title">${esc(cs.title)}</h2>
-    ${cs.sub ? `<p class="lead">${esc(cs.sub)}</p>` : ''}
     <a class="btn btn--black" href="${attr(d.vcfName)}" data-umami-event="vcard-contacto">${icon('contact')}<span>${esc(cta.save)}</span></a>
     <p class="save-help">${esc(cta.save_help || '')}</p>
     <p class="phone num" id="phone">${esc(d.phoneDisplay)}</p>
@@ -411,7 +412,7 @@ function jsonLd(cfg, d) {
     url: d.baseUrl,
     telephone: `+${contact.whatsapp}`,
     ...(contact.email ? { email: contact.email } : {}),
-    areaServed: { '@type': 'City', name: person.city },
+    areaServed: (person.area_served || [person.city]).map((name) => ({ '@type': 'City', name })),
     address: { '@type': 'PostalAddress', addressLocality: person.city, addressRegion: person.state, addressCountry: 'MX' },
     founder: { '@type': 'Person', name: person.name, jobTitle: person.title_long || person.title },
     sameAs: contact.instagram ? [`https://instagram.com/${contact.instagram.replace(/^@/, '')}`] : [],

@@ -106,7 +106,7 @@ test('index.html: CTAs y metadatos esenciales', () => {
   assert.ok(html.includes(`href="${d.waLinkPromo}"`), 'CTA de la promo con su mensaje');
   assert.ok(!/target="_blank"[^>]*wa\.me|wa\.me[^>]*target="_blank"/.test(html), 'wa.me sin target _blank: en móvil abre la app directo');
   assert.ok(html.includes(esc(cfg.promo.price)) && html.includes(`${esc(cfg.promo.regular_price)}</s>`), 'promo con precio y precio regular tachado');
-  assert.ok(html.includes(`${esc(cfg.how.price_label)}: <b class="num">${esc(cfg.how.price)}</b>`), 'precio regular publicado');
+  assert.ok(html.includes(`<b class="num">${esc(cfg.how.price)}</b>`) && html.includes(esc(cfg.how.price_label)), 'precio regular publicado');
   assert.ok(html.includes(d.phoneDisplay), 'el teléfono de la tarjeta impresa, tal cual');
   assert.ok(html.includes(esc(cfg.hero.headline)), 'la frase de la tarjeta impresa');
   const visible = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
@@ -218,9 +218,9 @@ test('publicado: los QR decodifican a las URL correctas', async () => {
     return r ? r.data : null;
   };
   assert.equal(await decode('qr-print.png'), d.qrSheetUrl);
-  assert.equal(await decode('qr-whatsapp.png'), d.waLink);
+  assert.equal(await decode('qr-whatsapp.png'), d.promo ? d.waLinkPromo : d.waLink);
   const sheetSvg = await qrSvg(d.qrSheetUrl, { ecl: 'H', margin: 4 });
-  const waSvg = await qrSvg(d.waLink, { ecl: 'M', margin: 4 });
+  const waSvg = await qrSvg(d.promo ? d.waLinkPromo : d.waLink, { ecl: 'M', margin: 4 });
   const wa = await readFile(path.join(outDir, 'imprimir-whatsapp.html'), 'utf8');
   assert.ok(print.includes(sheetSvg) && !print.includes(waSvg), 'la hoja principal lleva el QR del sitio');
   assert.ok(wa.includes(waSvg) && !wa.includes(sheetSvg), 'la hoja de respaldo lleva el QR de WhatsApp');

@@ -46,7 +46,7 @@ Todo lo editable vive en **`card.config.json`**. Lo mínimo:
    tipo `52XXXXXXXXXX`: un QR impreso que lleva a un WhatsApp inexistente es peor que no tener tarjeta.
 2. `promo`: Paola confirma `price` (propuesta $650), `regular_price` ($800) y `until` (propuesta
    2026-10-11, 14 días después de la carrera). Si no quiere promo: `"enabled": false`.
-3. `how.price`: el precio regular que se publica en "Así funciona" (vacío = no se muestra).
+3. `how.price`: el precio regular que se publica bajo los datos de la Licenciada (vacío = no se muestra).
 4. `contact.email` e `contact.instagram` (opcionales; si van vacíos, el botón no se muestra).
 5. `site.umami.website_id` (opcional): crear el sitio `paola.robertobh.dev` en stats.robertobh.dev y pegar el ID.
 

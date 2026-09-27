@@ -134,8 +134,10 @@ export async function build({ allowPlaceholders = process.env.ALLOW_PLACEHOLDERS
   const svgPrint = await qrSvg(d.qrSheetUrl, { ecl: 'H', margin: 4 });
   const pngPrint = await qrPng(d.qrSheetUrl, { ecl: 'H', margin: 4, width: 1600 });
   // Respaldo: QR directo a WhatsApp, por si el dominio no está listo. Más denso, ECL M.
-  const svgWa = await qrSvg(d.waLink, { ecl: 'M', margin: 4 });
-  const pngWa = await qrPng(d.waLink, { ecl: 'M', margin: 4, width: 1600 });
+  // Mientras la promoción esté activa, el QR de respaldo manda el mensaje de la promoción.
+  const waQr = d.promo ? d.waLinkPromo : d.waLink;
+  const svgWa = await qrSvg(waQr, { ecl: 'M', margin: 4 });
+  const pngWa = await qrPng(waQr, { ecl: 'M', margin: 4, width: 1600 });
 
   const brand = await loadBrand(PUBLIC);
   const ctx = { cfg, d, svgScreen, svgPrint, svgWa, brand };
