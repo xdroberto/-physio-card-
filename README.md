@@ -9,7 +9,8 @@ wordmark "Fisioterapeuta" y la firma extraídos del PDF como vectores exactos (`
 mismas tipografías, Italiana (títulos) y Jost (texto), autoalojadas en `public/fonts/`. El hero
 reproduce el reverso de la tarjeta (tagline, citas, zona y cédula); el pie, el frente.
 
-Dominio previsto: **https://paola.robertobh.dev** (subdominio de robertobh.dev).
+URL publicada: **https://xdroberto.github.io/-physio-card-/** (GitHub Pages). Si después se configura el dominio
+propio `paola.robertobh.dev`, GitHub redirige la URL de github.io al dominio y el QR impreso sigue funcionando.
 
 ## Estrategia en una hoja
 
