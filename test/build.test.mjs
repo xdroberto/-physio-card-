@@ -120,7 +120,7 @@ test('index.html: CTAs y metadatos esenciales', () => {
   assert.ok(html.includes('class="motif"') && html.includes('class="wordmark"') && html.includes('brand/firma-cream.svg'), 'logo, wordmark y firma de la tarjeta');
   assert.ok(html.includes('#FBEEE6') && html.includes('#0A0A0A'), 'paleta crema y negro de la tarjeta');
   assert.ok(html.includes('id="copy-cedula"'), 'tocar la cédula la copia');
-  assert.equal((html.match(/<section/g) || []).length, 5, 'hero + 5 secciones = 6 bloques');
+  assert.equal((html.match(/<section/g) || []).length, 4, 'hero + 4 secciones + pie');
   assert.ok(html.includes(cfg.person.cedula_verify_url), 'enlace para verificar cédula');
   assert.ok(html.includes('wakeLock'), 'wake lock en el modal QR');
 });

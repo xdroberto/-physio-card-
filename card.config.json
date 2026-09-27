@@ -32,7 +32,8 @@
     "state": "Qro.",
     "country": "México",
     "zone": "Querétaro, zona metropolitana y San José Iturbide",
-    "vcard_note": "Fisioterapeuta. Rehabilitación integral a domicilio en Querétaro y San José Iturbide. Contacto de la carrera de MTB."
+    "vcard_note": "Fisioterapeuta. Rehabilitación integral a domicilio en Querétaro y San José Iturbide. Contacto de la carrera de MTB.",
+    "zone_short": "Querétaro y San José Iturbide"
   },
   "contact": {
     "whatsapp": "524425500158",
@@ -51,14 +52,14 @@
   },
   "hero": {
     "headline": "Rehabilitación integral a domicilio",
-    "sub": "Valoración, masaje de descarga y rehabilitación de lesiones en su domicilio, con camilla y equipo propio."
+    "sub": "Lesiones deportivas, columna y masaje de descarga. Acudo con camilla y equipo."
   },
   "cta": {
     "whatsapp": "Escribir por WhatsApp",
     "whatsapp_sub": "Respuesta el mismo día",
     "whatsapp_how": "Agendar por WhatsApp",
     "save": "Guardar contacto",
-    "save_help": "Se abre o se descarga la ficha de contacto (.vcf). Si no funciona, copie el número y agréguelo manualmente.",
+    "save_help": "Si no se abre, copie el número.",
     "qr": "Mostrar QR",
     "call": "Llamar",
     "share": "Compartir",
@@ -74,16 +75,15 @@
     "price": "$650",
     "regular_price": "$800",
     "until": "2026-10-11",
-    "text": "Incluye valoración y tratamiento. Válida al agendar por WhatsApp hasta el {until}, mencionando la carrera.",
-    "cta": "Solicitar promoción",
-    "fine_print": "Exclusiva para participantes y acompañantes del evento. Querétaro, zona metropolitana y San José Iturbide."
+    "text": "Incluye valoración y tratamiento. Para participantes y acompañantes, hasta el {until}.",
+    "cta": "Solicitar promoción"
   },
   "pains": {
     "title": "¿Qué molestia presenta?",
-    "sub": "Seleccione una opción. El mensaje de WhatsApp se redacta solo.",
+    "sub": "Toque una opción: el mensaje se redacta solo.",
     "items": [
       {
-        "label": "Rodilla y cadera al pedalear",
+        "label": "Rodilla o cadera al pedalear",
         "zone": "la rodilla o la cadera al pedalear"
       },
       {
@@ -91,7 +91,7 @@
         "zone": "la espalda baja y el cuello"
       },
       {
-        "label": "Manos y antebrazos dormidos",
+        "label": "Manos dormidas",
         "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Se me duermen las manos y los antebrazos al rodar. ¿Qué días y horarios tiene disponibles para una sesión a domicilio?"
       },
       {
@@ -99,7 +99,7 @@
         "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Me gustaría agendar un masaje de descarga a domicilio. ¿Qué días y horarios tiene disponibles?"
       },
       {
-        "label": "Esguinces, caídas y tendinitis",
+        "label": "Esguince, caída o tendinitis",
         "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Tengo una lesión, no sé si sea un esguince o una tendinitis, y me gustaría que me valorara. ¿Qué días y horarios tiene disponibles para una sesión a domicilio?"
       },
       {
@@ -107,43 +107,46 @@
         "zone": "la columna"
       }
     ],
-    "note": "También atiendo postoperatorios, fracturas y rehabilitación de adultos mayores."
+    "note": "También atiendo postoperatorios, fracturas y adultos mayores."
   },
   "trust": {
-    "title": "Formación y experiencia",
-    "intro": "Licenciada en Fisioterapia con 4 años de práctica clínica en lesiones deportivas, dolor de columna y rehabilitación de adultos mayores. Le explico con claridad qué tiene y cuál será el tratamiento.",
-    "items": [
-      "1 año en el CRIT Teletón",
-      "4 años de práctica clínica",
-      "Certificación en punción seca",
-      "Vendaje neuromuscular (kinesiotape), electroterapia, ultrasonido y terapia manual",
-      "Camilla y equipo propio: la sesión completa en su domicilio"
+    "title": "Licenciada en Fisioterapia",
+    "facts": [
+      {
+        "value": "4 años",
+        "label": "de práctica clínica"
+      },
+      {
+        "value": "1 año",
+        "label": "en el CRIT Teletón"
+      },
+      {
+        "value": "Certificada",
+        "label": "en punción seca"
+      },
+      {
+        "value": "Kinesiotape",
+        "label": "terapia manual y electroterapia"
+      }
     ],
-    "verify_label": "Verificar cédula en el Registro Nacional de Profesionistas"
+    "verify_label": "Verificar en la SEP"
   },
   "how": {
-    "title": "Cómo funciona",
-    "steps": [
-      "Escríbame por WhatsApp y cuénteme qué le ocurre.",
-      "Acordamos fecha y hora. Acudo a su domicilio con camilla y equipo.",
-      "Valoración, tratamiento y plan de seguimiento en la misma visita."
-    ],
     "price_label": "Sesión a domicilio",
     "price": "$800",
-    "price_note": "Incluye traslado en Querétaro y zona metropolitana. San José Iturbide: consultar traslado."
+    "price_note": "Traslado incluido en Querétaro. San José Iturbide: consultar."
   },
   "contact_section": {
     "title": "Guarde mi contacto",
-    "sub": "Si ahora no puede escribir, guarde el contacto y envíeme un mensaje cuando le sea posible.",
-    "coverage": "Querétaro, zona metropolitana y San José Iturbide. Atención con cita previa, de lunes a sábado.",
-    "disclaimer": "Esta página es informativa y no sustituye una valoración presencial."
+    "coverage": "Cita previa, de lunes a sábado.",
+    "disclaimer": "Página informativa; no sustituye una valoración presencial."
   },
   "share": {
     "text": "Fisioterapeuta a domicilio en Querétaro y San José Iturbide. Céd. Prof. 15860222."
   },
   "qr_modal": {
     "title": "Escanee para abrir mi tarjeta",
-    "hint": "Apunte la cámara al código. Se abre la tarjeta y puede escribirme por WhatsApp en un toque.",
+    "hint": "Apunte la cámara al código para abrir la tarjeta.",
     "brightness_toast": "Brillo de pantalla al máximo para facilitar el escaneo"
   },
   "print": {

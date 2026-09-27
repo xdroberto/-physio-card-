@@ -50,8 +50,9 @@ Todo lo editable vive en **`card.config.json`**. Lo mínimo:
 4. `contact.email` e `contact.instagram` (opcionales; si van vacíos, el botón no se muestra).
 5. `site.umami.website_id` (opcional): crear el sitio `paola.robertobh.dev` en stats.robertobh.dev y pegar el ID.
 
-Todo lo demás (textos, chips de dolor con su mensaje, pasos, hoja impresa, Open Graph) también vive
-en ese JSON. Para el próximo evento solo cambian los textos que mencionan la carrera.
+Todo lo demás (textos, chips de dolor con su mensaje, datos de trayectoria en `trust.facts`, hojas
+impresas, Open Graph) también vive en ese JSON. Para el próximo evento solo cambian los textos que
+mencionan la carrera.
 
 Después:
 
@@ -71,6 +72,7 @@ node scripts/og.mjs    # regenerar public/og.png e íconos si cambian nombre o c
 |---|---|
 | `dist/imprimir.html` | Hoja carta con QR a la tarjeta. Abrir en el navegador → Imprimir → Guardar PDF. Papel mate, 3 copias. |
 | `dist/imprimir-whatsapp.html` | Hoja de respaldo: el QR abre WhatsApp directo con el mensaje listo. Sirve aunque el dominio no exista. |
+| `dist/imprimir-panfletos.html` | Hoja con 10 dientes recortables al pie, solo con nombre y WhatsApp, para que cada persona arranque uno. |
 | `dist/qr-print.png` | Solo el QR (1600 px) por si se quiere pegar en otro diseño. |
 | `https://paola.robertobh.dev/#qr` | Modo "Mostrar QR" para el teléfono de Paola. Al agregar la página a la pantalla de inicio, el ícono abre directo en modo QR (probarlo esta noche; si abre la tarjeta, usar la captura del QR en la galería). |
 

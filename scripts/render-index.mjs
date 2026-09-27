@@ -3,7 +3,7 @@ import { inlineSvg } from './brand.mjs';
 
 // La tarjeta digital, con la identidad de la tarjeta impresa: crema #FBEEE6, negro, logo de
 // columna, wordmark "Fisioterapeuta" y firma como vectores exactos; Italiana para títulos y
-// Jost para texto, autoalojadas. Una sola página móvil de seis bloques.
+// Jost para texto, autoalojadas. Una sola página móvil: hero, cuatro bloques y pie.
 export function renderIndex({ cfg, d, svgScreen, brand }) {
   const { person, contact, hero, cta, trust, how, og, pains, qr_modal: qrm, contact_section: cs, theme: t } = cfg;
   const promo = d.promo;
@@ -24,13 +24,12 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
     )
     .join('');
 
-  const trustItems = (trust.items || []).map((i) => `<li>${icon('check')}<span>${esc(i)}</span></li>`).join('');
+  const facts = (trust.facts || []).map((f) => `<li><span class="fact__v">${esc(f.value)}</span><span class="fact__l">${esc(f.label)}</span></li>`).join('');
   const verify =
     person.cedula_verify_url && trust.verify_label
       ? `<a class="verify" href="${attr(person.cedula_verify_url)}" target="_blank" rel="noopener" data-umami-event="verificar-cedula">${esc(trust.verify_label)} ${icon('external')}</a>`
       : '';
 
-  const steps = (how.steps || []).map((s) => `<li>${esc(s)}</li>`).join('');
   const priceLine = how.price
     ? `<p class="price"><span>${esc(how.price_label || 'Sesión a domicilio')}: <b class="num">${esc(how.price)}</b></span>${how.price_note ? `<span class="price__note">${esc(how.price_note)}</span>` : ''}</p>`
     : '';
@@ -57,7 +56,6 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
         <p class="promo__price"><b class="num">${esc(promo.price)}</b> <s class="num"><span class="sr-only">antes </span>${esc(promo.regular_price)}</s></p>
         <p class="promo__text">${esc(promo.text)}</p>
         <a class="btn btn--black" href="${attr(d.waLinkPromo)}" data-umami-event="whatsapp-promo">${icon('whatsapp')}<span>${esc(promo.cta || cta.whatsapp)}</span></a>
-        ${promo.fine_print ? `<p class="promo__fine">${esc(promo.fine_print)}</p>` : ''}
       </section>`
     : '';
 
@@ -141,16 +139,14 @@ b{font-weight:600}
 .firma{width:170px;height:auto}
 .qrpill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1.5px solid var(--cream);background:transparent;color:var(--cream);font-weight:500;font-size:15px;letter-spacing:.06em;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;white-space:nowrap;flex:none}
 .qrpill svg{width:20px;height:20px}
-.tagline{font-family:var(--serif);font-weight:400;font-size:clamp(38px,11vw,50px);line-height:1;letter-spacing:-.005em;margin:26px 0 12px;text-wrap:balance}
-.sub{font-size:17px;font-weight:300;line-height:1.45;color:var(--cream);text-wrap:pretty;max-width:34ch}
-.citas{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px;margin-top:22px}
-.citas__tel{text-decoration:none;color:var(--cream);display:grid;gap:0}
-.citas__lbl{font-size:13px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-dark)}
-.citas__num{font-size:30px;font-weight:300;line-height:1.1;letter-spacing:.01em}
-.zona{font-size:14.5px;font-weight:300;color:var(--muted-dark);line-height:1.4}
-@media (min-width:420px){.zona{text-align:right}}
-.actions{display:grid;gap:10px;margin-top:22px}
-.actions__row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.tagline{font-family:var(--serif);font-weight:400;font-size:clamp(38px,11vw,50px);line-height:1;letter-spacing:-.005em;margin:24px 0 10px;text-wrap:balance}
+.sub{font-size:16.5px;font-weight:300;line-height:1.4;color:var(--cream);text-wrap:pretty;max-width:34ch}
+.meta{display:grid;gap:6px;margin-top:20px}
+.meta__tel{text-decoration:none;color:var(--cream);display:flex;align-items:baseline;gap:10px;font-size:28px;font-weight:300;line-height:1.1}
+.meta__lbl{font-size:12px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-dark)}
+.zona{font-size:14.5px;font-weight:400;color:var(--muted-dark);line-height:1.4;display:flex;flex-wrap:wrap;gap:0 14px}
+.zona span{white-space:nowrap}
+.actions{display:grid;gap:10px;margin-top:24px}
 
 /* ---------- Botones ---------- */
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 16px;border-radius:var(--r);font-family:var(--sans);font-weight:500;font-size:17px;line-height:1.15;letter-spacing:.01em;text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .08s ease,filter .08s ease;cursor:pointer;text-align:center}
@@ -166,48 +162,46 @@ b{font-weight:600}
 .btn--outline{font-size:16px;min-height:52px}
 
 /* ---------- Secciones (crema, estilo editorial) ---------- */
-section{padding:26px 0 8px}
+section{padding:30px 0 12px}
 section+section{border-top:1px solid var(--line-soft)}
-.h2{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.05;margin-bottom:8px}
-.lead{font-size:16px;font-weight:300;color:var(--muted);margin:0 0 16px;max-width:38ch}
-.promo{border:1.5px solid var(--ink);border-radius:16px;padding:20px 18px 18px;margin-top:22px}
+.h2{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.05;margin-bottom:12px}
+.lead{font-size:15.5px;font-weight:300;color:var(--muted);margin:-4px 0 14px;max-width:38ch}
+.promo{border:1.5px solid var(--ink);border-radius:16px;padding:20px 18px 18px;margin-top:24px}
 .promo[hidden]{display:none}
 .promo__title{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.05;margin:6px 0 4px}
 .promo__price{display:flex;align-items:baseline;gap:12px;margin:4px 0 8px}
-.promo__price b{font-family:var(--serif);font-weight:400;font-size:52px;line-height:1}
+.promo__price b{font-family:var(--serif);font-weight:400;font-size:56px;line-height:1}
 .promo__price s{font-size:20px;font-weight:300;color:var(--muted)}
-.promo__text{font-size:16px;font-weight:400}
+.promo__text{font-size:15.5px;font-weight:400;color:var(--muted)}
 .promo .btn{margin-top:14px}
-.promo__fine{font-size:13.5px;font-weight:400;color:var(--muted);margin-top:10px}
-.pains{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.pain{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:58px;padding:10px 12px;border-radius:var(--r);border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:500;font-size:15.5px;line-height:1.2;text-decoration:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.pains{display:grid;border-top:1px solid var(--line-soft)}
+.pain{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:8px 4px;border-bottom:1px solid var(--line-soft);background:transparent;color:var(--ink);font-weight:500;font-size:17px;line-height:1.2;text-decoration:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .pain:active{background:var(--black);color:var(--cream)}
-.pain svg{width:18px;height:18px;flex:none}
-.pains__note{font-size:15px;font-weight:300;color:var(--muted);margin-top:14px}
-.trust__intro{font-size:17px;font-weight:400;margin-bottom:14px}
-.cedula-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1.5px solid var(--ink);border-radius:var(--r);margin-bottom:14px}
-.cedula-row .lbl{font-size:12.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.cedula-copy{font-family:var(--sans);font-size:24px;font-weight:300;background:none;border:0;padding:4px 6px;border-radius:8px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:8px;min-height:40px}
+.pain svg{width:22px;height:22px;flex:none}
+.pains__note{font-size:14.5px;font-weight:300;color:var(--muted);margin-top:12px}
+.cedula-row{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding:8px 0 10px;border-bottom:1px solid var(--line-soft);margin-bottom:16px}
+.cedula-row__main{display:grid;gap:0}
+.cedula-row .lbl{font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cedula-copy{font-family:var(--sans);font-size:24px;font-weight:300;background:none;border:0;padding:2px 0;border-radius:8px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:8px;min-height:36px}
 .cedula-copy svg{width:18px;height:18px}
-.checks{display:grid;gap:10px}
-.checks li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;font-size:16.5px;font-weight:400}
-.checks svg{width:22px;height:22px;margin-top:2px}
-.verify{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-weight:500;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:3px}
+.facts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 12px}
+.facts li{display:grid;gap:2px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.fact__v{font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.05;letter-spacing:-.005em}
+.fact__l{font-size:13.5px;font-weight:300;color:var(--muted);line-height:1.3}
+.verify{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-weight:500;font-size:15px;min-height:44px;text-decoration:underline;text-underline-offset:3px;flex:none}
 .verify svg{width:16px;height:16px}
-.steps{display:grid;gap:14px;counter-reset:s}
-.steps li{position:relative;padding-left:46px;counter-increment:s;font-size:17px;font-weight:400;min-height:36px}
-.steps li::before{content:counter(s);position:absolute;left:0;top:-6px;font-family:var(--serif);font-size:36px;line-height:1;color:var(--ink)}
-.price{display:grid;gap:2px;margin-top:16px;font-size:18px;font-weight:500}
-.price__note{font-size:15px;font-weight:300;color:var(--muted)}
-.how .btn{margin-top:16px}
-.save-help{font-size:14px;font-weight:300;color:var(--muted);margin:8px 0 12px}
+.price{display:grid;gap:4px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:16px;font-weight:500}
+.price .num{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1;letter-spacing:0;margin-left:4px}
+.price__note{font-size:14px;font-weight:300;color:var(--muted)}
+.trust .btn--black{margin-top:16px}
+.save-help{font-size:14px;font-weight:300;color:var(--muted);margin:8px 0 14px}
 .phone{font-size:30px;font-weight:300;margin:0 0 14px;user-select:all;-webkit-user-select:all}
 .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .grid2 .btn{padding-left:10px;padding-right:10px}
-.legal{margin-top:20px;font-size:14px;font-weight:300;color:var(--muted);display:grid;gap:6px}
+.legal{margin-top:18px;font-size:13.5px;font-weight:300;color:var(--muted);display:grid;gap:4px}
 
 /* ---------- Pie: el frente de la tarjeta ---------- */
-.front{border-top:1px solid var(--line-soft);margin-top:20px;padding:34px 20px 20px;text-align:center;display:grid;justify-items:center;gap:14px}
+.front{border-top:1px solid var(--line-soft);margin-top:24px;padding:36px 20px 24px;text-align:center;display:grid;justify-items:center;gap:14px}
 .front .logo{width:96px;height:auto}
 .front .wordmark{width:210px;height:auto}
 .front .firma{width:190px}
@@ -255,19 +249,16 @@ dialog.qr::backdrop{background:var(--cream)}
     </div>
     <h1 class="tagline">${esc(hero.headline)}</h1>
     <p class="sub">${esc(hero.sub)}</p>
-    <div class="citas">
-      <a class="citas__tel" href="${attr(d.telLink)}" data-umami-event="llamar-hero"><span class="citas__lbl">${esc(contact.phone_label || 'Citas')}</span><span class="citas__num num">${esc(d.phoneDisplay)}</span></a>
-      <p class="zona">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} <span class="num">${esc(person.cedula)}</span></p>
+    <div class="meta">
+      <a class="meta__tel num" href="${attr(d.telLink)}" data-umami-event="llamar-hero"><span class="meta__lbl">${esc(contact.phone_label || 'Citas')}</span><span>${esc(d.phoneDisplay)}</span></a>
+      <p class="zona"><span>${esc(person.zone_short || person.zone || person.city)}</span><span>${esc(person.cedula_label || 'Céd. Prof.')} <span class="num">${esc(person.cedula)}</span></span></p>
     </div>
     <nav class="actions" aria-label="Contacto directo">
       <a id="cta-wa" class="btn btn--cream" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-hero">
         <span class="btn__main">${icon('whatsapp')}<span>${esc(cta.whatsapp)}</span></span>
         <span class="btn__sub">${esc(cta.whatsapp_sub)}</span>
       </a>
-      <div class="actions__row">
-        <a class="btn btn--outline-cream" href="${attr(d.vcfName)}" data-umami-event="vcard-hero">${icon('contact')}<span>${esc(cta.save)}</span></a>
-        <a class="btn btn--outline-cream" href="${attr(d.telLink)}" data-umami-event="llamar-hero-btn">${icon('phone')}<span>${esc(cta.call)}</span></a>
-      </div>
+      <a class="btn btn--outline-cream" href="${attr(d.vcfName)}" data-umami-event="vcard-hero">${icon('contact')}<span>${esc(cta.save)}</span></a>
     </nav>
   </div>
 </header>
@@ -277,36 +268,29 @@ dialog.qr::backdrop{background:var(--cream)}
 
   <section aria-labelledby="pain-title">
     <h2 class="h2" id="pain-title">${esc(pains.title)}</h2>
-    <p class="lead">${esc(pains.sub || '')}</p>
+    ${pains.sub ? `<p class="lead">${esc(pains.sub)}</p>` : ''}
     <div class="pains">${painChips}</div>
     ${pains.note ? `<p class="pains__note">${esc(pains.note)}</p>` : ''}
   </section>
 
-  <section aria-labelledby="trust-title">
+  <section class="trust" aria-labelledby="trust-title">
     <h2 class="h2" id="trust-title">${esc(trust.title)}</h2>
-    ${trust.intro ? `<p class="trust__intro">${esc(trust.intro)}</p>` : ''}
-    ${person.cedula ? `<div class="cedula-row"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" aria-label="Copiar cédula profesional ${attr(person.cedula)}" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button><span class="lbl">${esc(person.title_long || person.title)}</span></div>` : ''}
-    <ul class="checks">${trustItems}</ul>
-    ${verify}
-  </section>
-
-  <section class="how" aria-labelledby="how-title">
-    <h2 class="h2" id="how-title">${esc(how.title)}</h2>
-    <ol class="steps">${steps}</ol>
+    ${person.cedula ? `<div class="cedula-row"><div class="cedula-row__main"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" aria-label="Copiar cédula profesional ${attr(person.cedula)}" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button></div>${verify}</div>` : ''}
+    ${facts ? `<ul class="facts">${facts}</ul>` : ''}
     ${priceLine}
     <a id="cta-wa-2" class="btn btn--black" href="${attr(d.waLink)}" data-wa="main" data-umami-event="whatsapp-how">${icon('whatsapp')}<span>${esc(cta.whatsapp_how || cta.whatsapp)}</span></a>
   </section>
 
   <section aria-labelledby="contact-title" id="contacto">
     <h2 class="h2" id="contact-title">${esc(cs.title)}</h2>
-    <p class="lead">${esc(cs.sub || '')}</p>
+    ${cs.sub ? `<p class="lead">${esc(cs.sub)}</p>` : ''}
     <a class="btn btn--black" href="${attr(d.vcfName)}" data-umami-event="vcard-contacto">${icon('contact')}<span>${esc(cta.save)}</span></a>
     <p class="save-help">${esc(cta.save_help || '')}</p>
     <p class="phone num" id="phone">${esc(d.phoneDisplay)}</p>
     <div class="grid2">${channels}</div>
     <div class="legal">
-      <p>${esc(cs.coverage)}</p>
-      <p>${esc(person.name)}. ${esc(person.title_long || person.title)}.${person.cedula ? ` Cédula profesional ${esc(person.cedula)}.` : ''}</p>
+      ${cs.coverage ? `<p>${esc(cs.coverage)}</p>` : ''}
+      <p>${esc(person.name)}, ${esc(person.title_long || person.title)}.${person.cedula ? ` ${esc(person.cedula_label || 'Céd. Prof.')} <span class="num">${esc(person.cedula)}</span>.` : ''}</p>
       ${cs.disclaimer ? `<p>${esc(cs.disclaimer)}</p>` : ''}
     </div>
   </section>
