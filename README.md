@@ -17,7 +17,7 @@ Dominio previsto: **https://paola.robertobh.dev** (subdominio de robertobh.dev).
 |---|---|---|
 | Alguien ve la hoja en la carpa | Escanea el QR con su cámara | `dist/imprimir.html` (hoja carta con QR grande + número de respaldo) |
 | Paola atiende a alguien y no hay hoja a la mano | Abre `paola.robertobh.dev/#qr` en su teléfono y se lo muestra | Modo QR a pantalla completa |
-| El lead abre la página al sol, con prisa | Ve nombre, cédula, a qué se dedica y un botón verde enorme | Hero compacto + CTA WhatsApp sobre el pliegue + barra fija al hacer scroll |
+| El lead abre la página al sol, con prisa | Ve nombre, cédula, a qué se dedica y un botón crema grande sobre negro | Hero compacto + CTA WhatsApp sobre el pliegue + barra fija al hacer scroll |
 | El lead no quiere escribir ahora | Toca **Guardar contacto** y queda en su agenda | vCard con nombre, teléfono, URL y nota "nos conocimos en la carrera" |
 | El lead escribe | Llega un WhatsApp que ya dice "te vi en la carrera de MTB" | Mensaje prellenado: Paola sabe de dónde viene cada lead |
 | El lead tiene un dolor concreto | Toca "Rodilla y cadera al pedalear" y se abre WhatsApp con la molestia ya escrita | Chips de dolor: cada uno es un enlace directo a wa.me |
@@ -30,9 +30,9 @@ Decisiones deliberadas:
 - **Sin modo oscuro del sistema.** La página fija sus colores: el hero negro es el reverso de la tarjeta y el
   resto va en crema, que a brillo máximo se lee bajo el sol.
 - **Cero requests a terceros.** Sin CDN ni JS externo; las dos fuentes van en el mismo dominio (37 KB en
-  total, con `font-display: swap`: el texto aparece antes de que carguen). El HTML pesa ~48 KB con el QR y
-  el logo inline.
-- **Registro de tú.** Público deportivo, trato directo.
+  total, con `font-display: swap`: el texto aparece antes de que carguen). Primera carga completa
+  (HTML con el QR y el logo inline, fuentes y la firma): unos 95 KB en 4 archivos.
+- **Registro de usted.** Trato profesional, frases cortas.
 - **La cédula profesional visible.** En México es la señal de confianza número uno para un fisioterapeuta.
 - **Sin formulario.** En un cerro nadie llena formularios; WhatsApp es el formulario.
 
@@ -47,8 +47,7 @@ Todo lo editable vive en **`card.config.json`**. Lo mínimo:
    2026-10-11, 14 días después de la carrera). Si no quiere promo: `"enabled": false`.
 3. `how.price`: el precio regular que se publica en "Así funciona" (vacío = no se muestra).
 4. `contact.email` e `contact.instagram` (opcionales; si van vacíos, el botón no se muestra).
-5. Foto (opcional): guardar `public/paola.jpg` (cuadrada, ~400 px, < 40 KB) y poner `"photo": "paola.jpg"`.
-6. `site.umami.website_id` (opcional): crear el sitio `paola.robertobh.dev` en stats.robertobh.dev y pegar el ID.
+5. `site.umami.website_id` (opcional): crear el sitio `paola.robertobh.dev` en stats.robertobh.dev y pegar el ID.
 
 Todo lo demás (textos, chips de dolor con su mensaje, pasos, hoja impresa, Open Graph) también vive
 en ese JSON. Para el próximo evento solo cambian los textos que mencionan la carrera.
@@ -58,9 +57,10 @@ Después:
 ```bash
 npm ci
 npm run build          # genera dist/
-npm test               # 13 pruebas: enlaces, vCard, peso, copy, archivos
+npm test               # pruebas: enlaces, vCard publicada, QR decodificados, peso, copy, seguridad
 npm run dev            # sirve dist/ en http://localhost:4173
-npm run screenshots    # capturas iPhone/Android + hoja-qr.pdf en screenshots/ (usa Playwright)
+npm run screenshots    # capturas iPhone/Android en screenshots/ (usa Playwright)
+npm run pdf            # PDF de las dos hojas en screenshots/ y comprobación de que son 1 página
 node scripts/og.mjs    # regenerar public/og.png e íconos si cambian nombre o colores
 ```
 
@@ -71,7 +71,7 @@ node scripts/og.mjs    # regenerar public/og.png e íconos si cambian nombre o c
 | `dist/imprimir.html` | Hoja carta con QR a la tarjeta. Abrir en el navegador → Imprimir → Guardar PDF. Papel mate, 3 copias. |
 | `dist/imprimir-whatsapp.html` | Hoja de respaldo: el QR abre WhatsApp directo con el mensaje listo. Sirve aunque el dominio no exista. |
 | `dist/qr-print.png` | Solo el QR (1600 px) por si se quiere pegar en otro diseño. |
-| `https://paola.robertobh.dev/#qr` | Modo "Mostrar QR" para el teléfono de Paola. Que lo agregue a su pantalla de inicio. |
+| `https://paola.robertobh.dev/#qr` | Modo "Mostrar QR" para el teléfono de Paola. Al agregar la página a la pantalla de inicio, el ícono abre directo en modo QR (probarlo esta noche; si abre la tarjeta, usar la captura del QR en la galería). |
 
 Antes de imprimir: probar el QR con un iPhone y un Android usando datos móviles (no wifi), y tocar
 WhatsApp, Llamar y Guardar contacto desde el teléfono.
@@ -83,17 +83,29 @@ opciones, hoy o dentro de un año, sin reimprimir nada.
 
 ### Opción A · GitHub Pages (recomendada: cero servidor que mantener)
 
-1. En el repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. **Settings → Pages → Custom domain:** `paola.robertobh.dev`. Guardar.
-3. En el DNS de robertobh.dev, registro **CNAME**: `paola` → `xdroberto.github.io` (TTL bajo, 300 s).
-4. Push a `main` (o **Actions → "Deploy — GitHub Pages" → Run workflow**). En ~1 min está publicado.
-5. Cuando GitHub termine de emitir el certificado (minutos, a veces una hora), marcar **Enforce HTTPS**.
+En este orden, para que el certificado salga a tiempo:
 
-Mientras el DNS propaga, la misma página vive en `https://xdroberto.github.io/-physio-card-/`.
+1. DNS de robertobh.dev: registro **CNAME** `paola` → `xdroberto.github.io`, TTL 300. Esperar a que
+   `dig +short paola.robertobh.dev CNAME` responda.
+2. En el repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. **Settings → Pages → Custom domain:** `paola.robertobh.dev` → Save (pasa el DNS check y arranca el certificado).
+4. **Actions → "Deploy — GitHub Pages" → Run workflow** desde la rama actual (es la rama default del repo).
+   Si el job Deploy falla con "not allowed to deploy to github-pages due to environment protection rules":
+   Settings → Environments → github-pages → Deployment branches → añadir la rama, y relanzar.
+5. Marcar **Enforce HTTPS** cuando GitHub termine de emitir el certificado (minutos, a veces una hora).
+   Si tras 10 minutos sigue "Certificate not yet created", quitar y volver a añadir el dominio.
+6. Comprobar desde un celular con datos: `https://paola.robertobh.dev/` con candado.
+
+Para que publique solo con cada push: crear `main` y hacerla default antes de habilitar Pages
+(`git push origin HEAD:refs/heads/main`; Settings → General → Default branch → main). Mientras el dominio
+no esté fijado, el build se puede revisar en la URL que imprime el job Deploy; con el dominio fijado,
+github.io redirige ahí.
+
+`paola` solo puede tener **un** registro DNS: CNAME (Pages) o A (VPS). Al cambiar de opción, borrar el otro.
 
 ### Opción B · VPS Hetzner (el mismo nginx que sirve robertobh.dev)
 
-1. DNS: registro **A** `paola` → `178.156.248.110`.
+1. DNS: registro **A** `paola` → `178.156.248.110` (y borrar el CNAME si existía).
 2. Una sola vez, desde este repo:
    ```bash
    scp deploy/setup-vps.sh deploy/nginx-paola.conf root@178.156.248.110:/root/
@@ -126,16 +138,17 @@ test/                   ← node:test
 
 ## Guion para Paola en la carpa
 
-Al terminar cada masaje, la misma frase: "Escanea aquí, guárdame y escríbeme, te aplico la promo".
-El guion verbal convierte más que cualquier diseño. En WhatsApp Business, activar el mensaje de
-ausencia: "Gracias por escribir. Estoy en la carrera, te respondo hoy en la tarde. Cuéntame qué te
-duele y qué días te acomodan". Brillo al máximo y bloqueo automático en 5 minutos mientras muestre el QR;
-una captura del modo QR en la galería funciona sin señal y sin batería de red.
+Al terminar cada masaje, la misma frase: "Escanee aquí, guarde mi contacto y escríbame; le aplico la
+promoción". En WhatsApp Business, activar el mensaje de ausencia: "Gracias por su mensaje. Hoy estoy
+atendiendo en la carrera; le respondo por la tarde. Cuénteme qué molestia presenta y qué días le
+acomodan". Brillo al máximo y bloqueo automático en 5 minutos mientras muestre el QR; una captura del
+modo QR en la galería funciona sin señal.
 
 ## Medir leads
 
 - Cada QR lleva su fuente: la hoja impresa abre `/?src=qr-hoja`, el teléfono de Paola `/?src=qr-tel`,
-  el botón Compartir `/?src=compartido` (con ese origen el mensaje prellenado no dice "te vi en la carrera").
+  el botón Compartir `/?src=compartido` (con ese origen los botones y chips no dicen "la vi en la carrera";
+  la promoción sí, porque es solo para asistentes).
 - Los botones llevan `data-umami-event` (`whatsapp-hero`, `whatsapp-chip` con la zona, `whatsapp-promo`,
   `whatsapp-sticky`, `vcard-hero`, `qr-abrir`, `llamar`, `compartir`…) y la propiedad `src`. Con Umami
   activo, el embudo escaneo → toque → WhatsApp se ve en el dashboard.

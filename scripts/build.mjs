@@ -28,6 +28,13 @@ export function validate(cfg) {
     problems.push(`site.url debe ser https://dominio/ sin ruta. Valor actual: "${cfg.site?.url}"`);
   }
   if (!cfg.person?.name) problems.push('person.name es obligatorio');
+  const disp = String(cfg.contact?.phone_display || '').replace(/\D/g, '');
+  if (disp && !wa.endsWith(disp)) {
+    problems.push(`contact.phone_display "${cfg.contact.phone_display}" no coincide con contact.whatsapp "${wa}"`);
+  }
+  for (const [k, v] of Object.entries(cfg.theme || {})) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(String(v))) problems.push(`theme.${k} debe ser un color hex de 6 dígitos. Valor actual: "${v}"`);
+  }
   if (!cfg.whatsapp?.greeting_event || !cfg.whatsapp?.ask) {
     problems.push('whatsapp.greeting_event y whatsapp.ask son obligatorios (arman el mensaje prellenado)');
   }
@@ -102,7 +109,7 @@ export function derive(cfg) {
     qrSheetUrl: qrUrl(base, cfg.site.source_print || 'qr-hoja'),
     qrScreenUrl: qrUrl(base, cfg.site.source_screen || 'qr-tel'),
     promo,
-    printPromoLine: fillTokens(cfg.print?.promo_line, cfg.promo?.enabled ? cfg.promo : null),
+    printPromoLine: cfg.promo?.enabled ? fillTokens(cfg.print?.promo_line, cfg.promo) : '',
   };
 }
 

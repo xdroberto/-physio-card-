@@ -16,9 +16,15 @@ CONF_SRC="${CONF_SRC:-/root/nginx-paola.conf}"
 AVAIL="/etc/nginx/sites-available/paola.conf"
 ENABLED="/etc/nginx/sites-enabled/paola.conf"
 
+VPS_IP="${VPS_IP:-178.156.248.110}"
 echo "→ Comprobando DNS de $DOMAIN"
-if ! getent hosts "$DOMAIN" >/dev/null; then
-  echo "✗ $DOMAIN todavía no resuelve. Crea el registro A y vuelve a correr." >&2
+RESOLVED="$(getent ahostsv4 "$DOMAIN" | awk '{print $1; exit}' || true)"
+if [ -z "$RESOLVED" ]; then
+  echo "✗ $DOMAIN todavía no resuelve. Crea el registro A -> $VPS_IP y vuelve a correr." >&2
+  exit 1
+fi
+if [ "$RESOLVED" != "$VPS_IP" ]; then
+  echo "✗ $DOMAIN resuelve a $RESOLVED, no a $VPS_IP (¿quedó el CNAME a GitHub Pages?). certbot fallaría el reto http-01." >&2
   exit 1
 fi
 
@@ -39,7 +45,7 @@ NGX
   ln -sf "$AVAIL" "$ENABLED"
   nginx -t && systemctl reload nginx
   echo "→ Emitiendo certificado"
-  certbot certonly --nginx -d "$DOMAIN" --non-interactive --agree-tos --keep-until-expiring
+  certbot certonly --nginx -d "$DOMAIN" --non-interactive --agree-tos --keep-until-expiring --register-unsafely-without-email
 fi
 
 echo "→ Instalando vhost definitivo"

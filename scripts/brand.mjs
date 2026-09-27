@@ -3,6 +3,7 @@
 // Los SVG fuente usan fill="currentColor"; aquí se producen variantes con color fijo para <img>.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { esc } from './html.mjs';
 
 export async function loadBrand(publicDir) {
   const names = ['logo', 'wordmark', 'firma'];
@@ -17,7 +18,7 @@ export async function loadBrand(publicDir) {
 
 // SVG inline con color heredado; se le puede dar clase y título accesible.
 export function inlineSvg(asset, { className = '', label = '' } = {}) {
-  const attrs = [className ? `class="${className}"` : '', label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"']
+  const attrs = [className ? `class="${esc(className)}"` : '', label ? `role="img" aria-label="${esc(label)}"` : 'aria-hidden="true"']
     .filter(Boolean)
     .join(' ');
   return asset.svg.replace('<svg ', `<svg ${attrs} `);

@@ -1,8 +1,9 @@
-# Deploy a GitHub Pages. Se dispara con push a main o a mano desde la pestaña Actions.
+# Deploy a GitHub Pages. Se dispara con push a main (hay que crear main: hoy la rama default es
+# claude/paola-digital-business-card-gavg7r) o a mano: Actions → Run workflow desde la rama default.
 #
-# Requisito único (una vez): Settings → Pages → Build and deployment → Source: "GitHub Actions".
-# Dominio propio: Settings → Pages → Custom domain: paola.robertobh.dev (+ CNAME en el DNS
-# apuntando a xdroberto.github.io). Marcar "Enforce HTTPS" cuando GitHub termine de emitir el cert.
+# Pasos (una vez), en este orden: (1) DNS: CNAME paola → xdroberto.github.io; (2) Settings → Pages →
+# Source: "GitHub Actions"; (3) Custom domain: paola.robertobh.dev; (4) Run workflow;
+# (5) "Enforce HTTPS" cuando GitHub termine de emitir el certificado. Detalle en README.md.
 name: "Deploy — GitHub Pages"
 
 on:
@@ -17,7 +18,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:

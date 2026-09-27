@@ -2,13 +2,14 @@
   "name": "paola-physio-card",
   "version": "1.0.0",
   "private": true,
-  "description": "Tarjeta de presentación digital (móvil) de Paola García Moctezuma, fisioterapeuta en Querétaro",
+  "description": "Tarjeta de presentaci\u00f3n digital (m\u00f3vil) de Paola Garc\u00eda Moctezuma, fisioterapeuta en Quer\u00e9taro",
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node scripts/build.mjs && python3 -m http.server 4173 --directory dist",
     "test": "node --test \"test/**/*.test.mjs\"",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "pdf": "node scripts/pdf.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -16,5 +17,8 @@
   "license": "UNLICENSED",
   "dependencies": {
     "qrcode": "1.5.4"
+  },
+  "devDependencies": {
+    "jsqr": "1.4.0"
   }
 }

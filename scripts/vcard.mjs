@@ -6,7 +6,7 @@ const esc = (v = '') =>
     .replace(/\\/g, '\\\\')
     .replace(/\n/g, '\\n')
     .replace(/,/g, '\\,')
-    .replace(/;/g, '\;');
+    .replace(/;/g, '\\;');
 
 function fold(line) {
   // RFC 6350 §3.2: plegar a 75 octetos; la continuación empieza con un espacio.

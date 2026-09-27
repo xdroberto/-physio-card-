@@ -5,7 +5,13 @@ import path from 'node:path';
 import os from 'node:os';
 import { build, validate, derive, formatMxPhone, formatLongDate, fillTokens, loadConfig } from '../scripts/build.mjs';
 import { buildVCard, splitName } from '../scripts/vcard.mjs';
-import { qrUrl } from '../scripts/qr.mjs';
+import { qrUrl, qrSvg } from '../scripts/qr.mjs';
+import { esc } from '../scripts/html.mjs';
+import { renderIndex } from '../scripts/render-index.mjs';
+import { renderPrint } from '../scripts/render-print.mjs';
+import { loadBrand } from '../scripts/brand.mjs';
+import { PNG } from 'pngjs';
+import jsQR from 'jsqr';
 
 const outDir = await mkdtemp(path.join(os.tmpdir(), 'physio-card-'));
 const result = await build({ allowPlaceholders: true, outDir });
@@ -22,8 +28,10 @@ test('config: el número de WhatsApp está capturado (si falla, edita card.confi
 test('validate: rechaza placeholders y acepta un número real', () => {
   const bad = structuredClone(cfg); bad.contact.whatsapp = '52XXXXXXXXXX';
   assert.ok(validate(bad).some((p) => p.includes('contact.whatsapp')));
-  const good = structuredClone(cfg); good.contact.whatsapp = '524421234567';
+  const good = structuredClone(cfg); good.contact.whatsapp = '524421234567'; good.contact.phone_display = '';
   assert.equal(validate(good).filter((p) => p.includes('whatsapp')).length, 0);
+  const mismatch = structuredClone(cfg); mismatch.contact.whatsapp = '524421234567';
+  assert.ok(validate(mismatch).some((p) => p.includes('phone_display')), 'phone_display debe coincidir con el número');
 });
 
 test('formatMxPhone: formato legible para México', () => {
@@ -47,13 +55,17 @@ test('derive: wa.me con mensaje prellenado codificado y tel: en E.164', () => {
   assert.equal(dd.qrScreenUrl, 'https://paola.robertobh.dev/?src=qr-tel');
 });
 
-test('promo: tokens y fecha larga en español, y el build exige sus campos', () => {
+test('promo: tokens y fecha larga en español, y el build exige sus campos', async () => {
   assert.equal(formatLongDate('2026-10-11').replace(/ de 20\d\d$/, ''), '11 de octubre');
   assert.equal(fillTokens('A {price} en vez de {regular_price} hasta el {until}', { price: '$650', regular_price: '$800', until: '2026-10-11' }).replace(/ de 20\d\d$/, ''), 'A $650 en vez de $800 hasta el 11 de octubre');
   const bad = structuredClone(cfg); bad.promo.enabled = true; bad.promo.until = '11/10/2026';
   assert.ok(validate(bad).some((p) => p.includes('promo.until')));
   const off = structuredClone(cfg); off.promo.enabled = false; off.promo.until = '';
   assert.equal(validate(off).filter((p) => p.includes('promo')).length, 0);
+  assert.equal(derive(off).printPromoLine, '', 'con la promo apagada la hoja no lleva la línea de promo');
+  const brand = await loadBrand(path.resolve('public'));
+  const sheet = renderPrint({ cfg: off, d: derive(off), svgPrint: '<svg></svg>', svgWa: '<svg></svg>', brand });
+  assert.ok(!sheet.includes('class="promo"'));
 });
 
 test('qrUrl: agrega src sin romper la URL', () => {
@@ -77,16 +89,20 @@ test('index.html: CTAs y metadatos esenciales', () => {
   for (const p of d.pains) assert.ok(html.includes(`href="${p.link}"`), `chip ${p.label}`);
   assert.ok(html.includes(`href="${d.waLinkPromo}"`), 'CTA de la promo con su mensaje');
   assert.ok(!/target="_blank"[^>]*wa\.me|wa\.me[^>]*target="_blank"/.test(html), 'wa.me sin target _blank: en móvil abre la app directo');
-  assert.ok(html.includes('$650') && html.includes('<s class="num">$800</s>'), 'promo con precio y precio regular tachado');
-  assert.ok(html.includes('Sesión a domicilio: <b class="num">$800</b>'), 'precio regular publicado en Así funciona');
-  assert.ok(html.includes('442 550 0158'), 'el teléfono de la tarjeta impresa, tal cual');
-  assert.ok(html.includes('Rehabilitación integral a domicilio'), 'la frase de la tarjeta impresa');
+  assert.ok(html.includes(esc(cfg.promo.price)) && html.includes(`${esc(cfg.promo.regular_price)}</s>`), 'promo con precio y precio regular tachado');
+  assert.ok(html.includes(`${esc(cfg.how.price_label)}: <b class="num">${esc(cfg.how.price)}</b>`), 'precio regular publicado');
+  assert.ok(html.includes(d.phoneDisplay), 'el teléfono de la tarjeta impresa, tal cual');
+  assert.ok(html.includes(esc(cfg.hero.headline)), 'la frase de la tarjeta impresa');
+  assert.ok(html.includes(`data-until="${cfg.promo.until}"`), 'la promo lleva su fecha de vencimiento');
+  assert.ok(d.pains.every((p) => p.message.startsWith(cfg.whatsapp.greeting_event)), 'cada chip empieza con el saludo del evento (el reemplazo por src=compartido depende de ello)');
+  assert.ok(html.includes('aria-label="Copiar cédula profesional') && html.includes('<span class="sr-only">antes </span>'), 'accesibilidad: cédula y precio tachado');
+  assert.ok(!html.includes('say(C.brightness)') && html.includes('class="qr__tip"'), 'el aviso de brillo vive dentro del modal');
+  assert.ok(html.includes("start_url") === false, 'start_url no va en el HTML');
   assert.ok(html.includes('fonts/italiana-400.woff2') && html.includes('fonts/jost-var.woff2'), 'tipografías de la tarjeta autoalojadas');
   assert.ok(html.includes('class="motif"') && html.includes('class="wordmark"') && html.includes('brand/firma-cream.svg'), 'logo, wordmark y firma de la tarjeta');
   assert.ok(html.includes('#FBEEE6') && html.includes('#0A0A0A'), 'paleta crema y negro de la tarjeta');
   assert.ok(html.includes('id="copy-cedula"'), 'tocar la cédula la copia');
   assert.equal((html.match(/<section/g) || []).length, 5, 'hero + 5 secciones = 6 bloques');
-  assert.ok(html.includes('data-until="2026-10-11"') || !cfg.promo.enabled, 'la promo lleva su fecha de vencimiento');
   assert.ok(html.includes(cfg.person.cedula_verify_url), 'enlace para verificar cédula');
   assert.ok(html.includes('wakeLock'), 'wake lock en el modal QR');
 });
@@ -101,9 +117,10 @@ test('index.html: sin requests a terceros (salvo Umami si está configurado)', (
 
 test('index.html: peso bajo para 3G en el cerro', async () => {
   assert.ok(result.indexBytes < 60 * 1024, `index.html pesa ${result.indexBytes} bytes`);
+  const refs = new Set([...html.matchAll(/(?:src|href)="((?:fonts|brand)\/[^"]+)"/g)].map((m) => m[1]).concat([...html.matchAll(/url\((fonts\/[^)]+)\)/g)].map((m) => m[1])));
   let total = result.indexBytes;
-  for (const f of ['fonts/italiana-400.woff2', 'fonts/jost-var.woff2', 'brand/firma-cream.svg']) total += (await readFile(path.join(outDir, f))).length;
-  assert.ok(total < 130 * 1024, `primera carga (html + fuentes + firma) pesa ${total} bytes`);
+  for (const f of refs) total += (await readFile(path.join(outDir, f))).length;
+  assert.ok(total < 150 * 1024, `primera carga (html + fuentes + marca) pesa ${total} bytes en ${refs.size + 1} archivos`);
 });
 
 test('index.html: copy sin em-dashes ni placeholders sin resolver', () => {
@@ -117,9 +134,10 @@ test('imprimir.html: QR grande, número de respaldo y dominio', () => {
   assert.match(print, /<svg[^>]*>[\s\S]*<\/svg>/);
   assert.ok(print.includes(d.phoneDisplay));
   assert.ok(print.includes(d.host));
-  assert.ok(print.includes('precio regular $800'), 'la hoja ancla el precio regular');
-  assert.ok(print.includes('$650'), 'la hoja anuncia la promo con precio');
-  assert.ok(print.includes('11 de octubre'), 'fecha de vencimiento en formato largo');
+  assert.ok(print.includes(`precio regular ${esc(cfg.promo.regular_price)}`), 'la hoja ancla el precio regular');
+  assert.ok(print.includes(esc(cfg.promo.price)), 'la hoja anuncia la promo con precio');
+  assert.ok(print.includes(formatLongDate(cfg.promo.until).replace(/ de 20\d\d$/, '')), 'fecha de vencimiento en formato largo');
+  assert.ok(!print.includes('page-break-after'), 'la hoja no fuerza salto de página');
   assert.ok(print.includes('class="logo"') && print.includes('brand/firma-black.svg'), 'la hoja lleva el frente de la tarjeta');
 });
 
@@ -157,7 +175,40 @@ test('dist: archivos esperados', async () => {
   assert.equal((await readFile(path.join(outDir, 'CNAME'), 'utf8')).trim(), 'paola.robertobh.dev');
 });
 
-test('config real carga y es JSON válido', async () => {
-  const c = await loadConfig();
-  assert.equal(c.person.name, 'Paola García Moctezuma');
+test('publicado: la vCard de dist lleva el mismo número, nombre y URL que la página', async () => {
+  const v = await readFile(path.join(outDir, d.vcfName), 'utf8');
+  assert.ok(v.includes(`TEL;TYPE=CELL,VOICE:+${cfg.contact.whatsapp}`));
+  assert.ok(v.includes(`FN:${cfg.person.name}`));
+  assert.ok(v.includes(`URL:${d.baseUrl}`));
+});
+
+test('publicado: los QR decodifican a las URL correctas', async () => {
+  const decode = async (f) => {
+    const png = PNG.sync.read(await readFile(path.join(outDir, f)));
+    const r = jsQR(new Uint8ClampedArray(png.data), png.width, png.height);
+    return r ? r.data : null;
+  };
+  assert.equal(await decode('qr-print.png'), d.qrSheetUrl);
+  assert.equal(await decode('qr-whatsapp.png'), d.waLink);
+  const sheetSvg = await qrSvg(d.qrSheetUrl, { ecl: 'H', margin: 4 });
+  const waSvg = await qrSvg(d.waLink, { ecl: 'M', margin: 4 });
+  const wa = await readFile(path.join(outDir, 'imprimir-whatsapp.html'), 'utf8');
+  assert.ok(print.includes(sheetSvg) && !print.includes(waSvg), 'la hoja principal lleva el QR del sitio');
+  assert.ok(wa.includes(waSvg) && !wa.includes(sheetSvg), 'la hoja de respaldo lleva el QR de WhatsApp');
+});
+
+test('seguridad: texto hostil en la config no rompe el HTML', async () => {
+  const evil = structuredClone(cfg);
+  evil.person.name = 'Ana "Q" <b>x</b></script><script>alert(1)</script>';
+  evil.og.title = '</script><img src=x onerror=alert(1)>';
+  evil.person.title = 'Fisio" onmouseover="alert(1)';
+  const brand = await loadBrand(path.resolve('public'));
+  const out = renderIndex({ cfg: evil, d: derive(evil), svgScreen: '<svg></svg>', brand });
+  assert.ok(!out.includes('<script>alert(1)</script>'), 'script inyectado en el cuerpo');
+  assert.ok(!out.includes('</script><img'), 'cierre de script inyectado en JSON');
+  assert.ok(!/onmouseover="alert/.test(out), 'atributo inyectado');
+  const bad = structuredClone(cfg); bad.theme.cream = 'red';
+  assert.ok(validate(bad).some((p) => p.includes('theme.cream')));
+  const v = buildVCard({ ...cfg, person: { ...cfg.person, name: 'Ana; López' } });
+  assert.ok(v.includes('FN:Ana\\; López'), 'la vCard escapa el punto y coma');
 });

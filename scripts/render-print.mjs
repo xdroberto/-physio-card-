@@ -10,10 +10,10 @@ export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' 
   const { person, contact, theme: t } = cfg;
   const isWa = mode === 'wa';
   const svg = isWa ? svgWa : svgPrint;
-  const instruction = p.instruction || 'Escanea y escríbeme por WhatsApp';
+  const instruction = p.instruction || 'Escanee y escríbame por WhatsApp';
   const instructionSub = isWa
-    ? 'Abre la cámara de tu celular y apúntala al código. Se abre WhatsApp con el mensaje listo: solo toca Enviar.'
-    : p.instruction_sub || 'Abre la cámara de tu celular y apúntala al código';
+    ? 'Abra la cámara de su celular y apúntela al código. Se abre WhatsApp con el mensaje listo: solo toque Enviar.'
+    : p.instruction_sub || 'Abra la cámara de su celular y apúntela al código';
   return `<!doctype html>
 <html lang="es-MX">
 <head>
@@ -28,14 +28,14 @@ export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' 
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #fff; color: ${t.black}; }
   body { font-family: "Jost", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .sheet { width: 8.5in; height: 11in; margin: 0 auto; padding: 0.5in 0.6in 0.4in; background: ${t.cream}; display: flex; flex-direction: column; align-items: center; text-align: center; page-break-after: always; }
-  .brand { display: grid; justify-items: center; gap: 10pt; }
+  .sheet { width: 8.5in; height: 11in; margin: 0 auto; padding: 0.4in 0.6in 0.4in; background: ${t.cream}; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .brand { display: grid; justify-items: center; gap: 6pt; }
   .brand .logo { width: 80pt; height: auto; color: ${t.black}; }
   .brand .wordmark { width: 230pt; height: auto; color: ${t.black}; }
   .brand .firma { width: 200pt; height: auto; }
   .tagline { font-family: "Italiana", Georgia, serif; font-weight: 400; font-size: 32pt; line-height: 1.02; margin: 14pt 0 3pt; }
   .hook { font-size: 14pt; font-weight: 400; color: #4A423E; margin: 0; }
-  .qr { width: 4.3in; height: 4.3in; margin: 12pt auto 4pt; background: #fff; border-radius: 12pt; padding: 10pt; }
+  .qr { width: 3.9in; height: 3.9in; margin: 10pt auto 4pt; background: #fff; border-radius: 12pt; padding: 10pt; }
   .qr svg { width: 100%; height: 100%; display: block; }
   .scan { font-size: 21pt; font-weight: 500; margin: 2pt 0 2pt; }
   .scan small { display: block; font-size: 11.5pt; font-weight: 400; color: #4A423E; margin: 3pt auto 0; max-width: 6.3in; }

@@ -1,4 +1,4 @@
-import { esc, attr } from './html.mjs';
+import { esc, attr, jsonInline } from './html.mjs';
 import { inlineSvg } from './brand.mjs';
 
 // La tarjeta digital, con la identidad de la tarjeta impresa: crema #FBEEE6, negro, logo de
@@ -15,8 +15,8 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
 
   const wordmark = inlineSvg(brand.wordmark, { className: 'wordmark', label: person.title });
   const motif = inlineSvg(brand.logo, { className: 'motif' });
-  const firmaImg = (cls, color) =>
-    `<img class="${cls}" src="brand/firma-${color}.svg" width="${brand.firma.w.toFixed(0)}" height="${brand.firma.h.toFixed(0)}" alt="${attr(person.name)}">`;
+  const firmaImg = (cls, color, lazy = false) =>
+    `<img class="${cls}" src="brand/firma-${color}.svg" width="${brand.firma.w.toFixed(0)}" height="${brand.firma.h.toFixed(0)}" alt="${attr(person.name)}"${lazy ? ' loading="lazy"' : ''}>`;
 
   const painChips = d.pains
     .map(
@@ -54,7 +54,7 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
     ? `<section class="promo" id="promo" aria-labelledby="promo-title" data-until="${attr(promo.until)}">
         <p class="eyebrow">${esc(promo.eyebrow)}</p>
         <h2 id="promo-title" class="promo__title">${esc(promo.title)}</h2>
-        <p class="promo__price"><b class="num">${esc(promo.price)}</b> <s class="num">${esc(promo.regular_price)}</s></p>
+        <p class="promo__price"><b class="num">${esc(promo.price)}</b> <s class="num"><span class="sr-only">antes </span>${esc(promo.regular_price)}</s></p>
         <p class="promo__text">${esc(promo.text)}</p>
         <a class="btn btn--black" href="${attr(d.waLinkPromo)}" data-umami-event="whatsapp-promo">${icon('whatsapp')}<span>${esc(promo.cta || cta.whatsapp)}</span></a>
         ${promo.fine_print ? `<p class="promo__fine">${esc(promo.fine_print)}</p>` : ''}
@@ -74,7 +74,6 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
     copied: cta.copied,
     linkCopied: cta.link_copied || cta.copied,
     cedulaCopied: cta.cedula_copied || 'Copiado',
-    brightness: qrm?.brightness_toast || '',
   };
 
   return `<!doctype html>
@@ -102,7 +101,7 @@ export function renderIndex({ cfg, d, svgScreen, brand }) {
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fonts/italiana-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jost-var.woff2" as="font" type="font/woff2" crossorigin>
-<script type="application/ld+json">${JSON.stringify(jsonLd(cfg, d))}</script>
+<script type="application/ld+json">${jsonInline(jsonLd(cfg, d))}</script>
 <style>
 @font-face{font-family:"Italiana";src:url(fonts/italiana-400.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:"Jost";src:url(fonts/jost-var.woff2) format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
@@ -125,6 +124,8 @@ ul,ol{padding:0;list-style:none}
 button{font:inherit;color:inherit}
 b{font-weight:600}
 :focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:6px}
+.hero :focus-visible,.sticky :focus-visible{outline-color:var(--cream)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 .num{font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .serif{font-family:var(--serif);font-weight:400}
@@ -218,16 +219,19 @@ section+section{border-top:1px solid var(--line-soft)}
 .sticky .btn--cream{max-width:var(--maxw);margin:0 auto;min-height:56px;flex-direction:row;gap:10px;font-size:18px}
 
 /* ---------- QR ---------- */
-dialog.qr{border:0;padding:0;background:var(--cream);color:var(--ink);width:min(100vw,560px);max-width:100vw;height:100dvh;max-height:100dvh;margin:0 auto}
+dialog.qr{border:0;padding:0;background:var(--cream);color:var(--ink);width:min(100vw,560px);max-width:100vw;height:100dvh;max-height:100dvh;margin:0 auto;overflow:auto}
+dialog:not([open]){display:none}
+body:has(dialog[open]){overflow:hidden}
 dialog.qr::backdrop{background:var(--cream)}
-.qr__inner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px 20px calc(24px + var(--safe-b));text-align:center;gap:12px}
+.qr__inner{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:24px 20px calc(24px + var(--safe-b));text-align:center;gap:12px}
 .qr__title{font-family:var(--serif);font-size:30px;line-height:1.05;padding:0 56px}
-.qr__code{width:min(86vw,58dvh,420px);height:auto;background:var(--white);border-radius:16px;padding:12px}
+.qr__code{width:min(86vw,50dvh,420px);height:auto;background:var(--white);border-radius:16px;padding:12px}
 .qr__code svg{width:100%;height:auto;display:block}
 .qr__brand{display:grid;justify-items:center;gap:8px}
 .qr__brand .wordmark{width:150px;height:auto}
 .qr__brand .firma{width:150px}
 .qr__hint{font-size:15.5px;font-weight:300;color:var(--muted);max-width:34ch}
+.qr__tip{font-size:14px;font-weight:500;color:var(--ink)}
 .qr__url{font-weight:500;font-size:16px;letter-spacing:.02em}
 .qr__close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:56px;height:56px;border-radius:50%;border:1.5px solid var(--ink);background:var(--cream);font-size:28px;line-height:1;color:var(--ink);cursor:pointer;touch-action:manipulation}
 
@@ -238,6 +242,7 @@ dialog.qr::backdrop{background:var(--cream)}
 @media (min-width:600px){.hero .wrap{padding-top:40px}}
 @media print{.sticky,.toast,.qrpill{display:none}}
 </style>
+<noscript><style>#open-qr,#copy-num,#share,#copy-cedula svg{display:none}</style></noscript>
 </head>
 <body>
 <header class="hero">
@@ -282,7 +287,7 @@ dialog.qr::backdrop{background:var(--cream)}
   <section aria-labelledby="trust-title">
     <h2 class="h2" id="trust-title">${esc(trust.title)}</h2>
     ${trust.intro ? `<p class="trust__intro">${esc(trust.intro)}</p>` : ''}
-    ${person.cedula ? `<div class="cedula-row"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button><span class="lbl">${esc(person.title_long || person.title)}</span></div>` : ''}
+    ${person.cedula ? `<div class="cedula-row"><span class="lbl">Cédula profesional</span><button class="cedula-copy num" type="button" id="copy-cedula" aria-label="Copiar cédula profesional ${attr(person.cedula)}" data-umami-event="copiar-cedula">${esc(person.cedula)} ${icon('copy')}</button><span class="lbl">${esc(person.title_long || person.title)}</span></div>` : ''}
     <ul class="checks">${trustItems}</ul>
     ${verify}
   </section>
@@ -313,7 +318,7 @@ dialog.qr::backdrop{background:var(--cream)}
 <footer class="front" aria-label="Marca">
   <img class="logo" src="brand/logo-black.svg" width="${brand.logo.w.toFixed(0)}" height="${brand.logo.h.toFixed(0)}" alt="" loading="lazy">
   <img class="wordmark" src="brand/wordmark-black.svg" width="${brand.wordmark.w.toFixed(0)}" height="${brand.wordmark.h.toFixed(0)}" alt="${attr(person.title)}" loading="lazy">
-  ${firmaImg('firma', 'black')}
+  ${firmaImg('firma', 'black', true)}
 </footer>
 
 <div class="sticky" id="sticky" aria-hidden="true">
@@ -323,10 +328,11 @@ dialog.qr::backdrop{background:var(--cream)}
 <dialog class="qr" id="qr" aria-labelledby="qr-title">
   <div class="qr__inner">
     <button class="qr__close" type="button" id="close-qr" aria-label="Cerrar">×</button>
-    <p class="qr__title" id="qr-title">${esc(qrm?.title || 'Escanea para abrir mi tarjeta')}</p>
+    <p class="qr__title" id="qr-title">${esc(qrm?.title || 'Escanee para abrir mi tarjeta')}</p>
     <div class="qr__code" role="img" aria-label="Código QR de esta tarjeta">${svgScreen}</div>
     <div class="qr__brand"><img class="wordmark" src="brand/wordmark-black.svg" width="${brand.wordmark.w.toFixed(0)}" height="${brand.wordmark.h.toFixed(0)}" alt="${attr(person.title)}">${firmaImg('firma', 'black')}</div>
     <p class="qr__hint">${esc(qrm?.hint || '')}</p>
+    ${qrm?.brightness_toast ? `<p class="qr__tip">${esc(qrm.brightness_toast)}</p>` : ''}
     <p class="qr__url">${esc(d.host)}</p>
   </div>
 </dialog>
@@ -335,15 +341,15 @@ dialog.qr::backdrop{background:var(--cream)}
 
 <script>
 (function(){
-  var C=${JSON.stringify(jsConfig)};
+  var C=${jsonInline(jsConfig)};
   var $=function(id){return document.getElementById(id);};
   var src=new URLSearchParams(location.search).get('src')||'';
 
   /* Mensaje principal: quien llega por un link compartido no "vio a Paola en la carrera". */
   if(src==='compartido'){
-    var msg=C.waBase+encodeURIComponent(C.greetGeneric+' '+C.ask);
-    var mains=document.querySelectorAll('a[data-wa="main"]');
-    for(var i=0;i<mains.length;i++){mains[i].href=msg;}
+    var ge='?text='+encodeURIComponent(C.greetEvent),gg='?text='+encodeURIComponent(C.greetGeneric);
+    var links=document.querySelectorAll('a[href^="https://wa.me/"]:not([data-umami-event="whatsapp-promo"])');
+    for(var i=0;i<links.length;i++){links[i].href=links[i].href.replace(ge,gg);}
   }
   if(src){
     var tracked=document.querySelectorAll('[data-umami-event]');
@@ -379,7 +385,6 @@ dialog.qr::backdrop{background:var(--cream)}
     if(qr.showModal){qr.showModal();}else{qr.setAttribute('open','');}
     if(fromClick&&location.hash!=='#qr'){history.pushState(null,'',location.pathname+location.search+'#qr');pushed=true;}
     if(navigator.wakeLock&&navigator.wakeLock.request){navigator.wakeLock.request('screen').then(function(l){lock=l;}).catch(function(){});}
-    say(C.brightness);
   }
   function hideQR(){
     if(qr.open){ if(qr.close){qr.close();}else{qr.removeAttribute('open');} }
@@ -388,7 +393,6 @@ dialog.qr::backdrop{background:var(--cream)}
   }
   $('open-qr').addEventListener('click',function(){showQR(true);});
   $('close-qr').addEventListener('click',hideQR);
-  qr.addEventListener('click',function(e){ if(e.target===qr){hideQR();} });
   qr.addEventListener('close',hideQR);
   if(location.hash==='#qr'){ showQR(false); }
   window.addEventListener('popstate',function(){ if(location.hash==='#qr'){showQR(false);}else{pushed=false;hideQR();} });
