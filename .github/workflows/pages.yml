@@ -8,7 +8,8 @@ name: "Deploy — GitHub Pages"
 
 on:
   push:
-    branches: [main]
+    # main aún no existe; mientras tanto, la rama de trabajo (hoy la default) también publica.
+    branches: [main, claude/paola-digital-business-card-gavg7r]
   workflow_dispatch:
 
 permissions:
