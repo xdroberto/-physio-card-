@@ -51,8 +51,8 @@ test('derive: wa.me con mensaje prellenado codificado y tel: en E.164', () => {
   assert.ok(dd.pains.every((p) => p.message.includes('MTB')), 'cada chip menciona la carrera');
   assert.ok(dd.pains.every((p) => p.link.startsWith('https://wa.me/524421234567?text=')));
   assert.equal(dd.telLink, 'tel:+524421234567');
-  assert.equal(dd.qrSheetUrl, 'https://paola.robertobh.dev/?src=qr-hoja');
-  assert.equal(dd.qrScreenUrl, 'https://paola.robertobh.dev/?src=qr-tel');
+  assert.equal(dd.qrSheetUrl, `${d.baseUrl}?src=qr-hoja`);
+  assert.equal(dd.qrScreenUrl, `${d.baseUrl}?src=qr-tel`);
 });
 
 test('promo: tokens y fecha larga en español, y el build exige sus campos', async () => {
@@ -97,7 +97,7 @@ test('index.html: CTAs y metadatos esenciales', () => {
   assert.ok(html.includes(`href="${d.telLink}"`), 'enlace tel:');
   assert.match(html, /<dialog class="qr"/);
   assert.match(html, /<svg[^>]*>[\s\S]*<\/svg>/, 'QR inline');
-  assert.match(html, /property="og:image" content="https:\/\/paola\.robertobh\.dev\/og\.png"/);
+  assert.ok(html.includes(`property="og:image" content="${d.baseUrl}og.png"`), 'og:image absoluta en la URL publicada');
   assert.match(html, /"@type":"Physiotherapy"/);
   assert.ok(html.includes(cfg.person.cedula), 'cédula visible');
   assert.equal((html.match(/<a [^>]*data-wa="main"/g) || []).length, 4, 'hero, así funciona, contacto y barra fija llevan el mensaje principal');
@@ -127,8 +127,8 @@ test('index.html: CTAs y metadatos esenciales', () => {
 
 test('index.html: sin requests a terceros (salvo Umami si está configurado)', () => {
   const urls = [...html.matchAll(/(?:src|href)="(https?:\/\/[^"]+)"/g)].map((m) => m[1]);
-  const allowed = /^(https:\/\/wa\.me\/|https:\/\/instagram\.com\/|https:\/\/paola\.robertobh\.dev\/|https:\/\/stats\.robertobh\.dev\/|https:\/\/www\.cedulaprofesional\.sep\.gob\.mx\/)/;
-  const bad = urls.filter((u) => !allowed.test(u));
+  const allowed = /^(https:\/\/wa\.me\/|https:\/\/instagram\.com\/|https:\/\/stats\.robertobh\.dev\/|https:\/\/www\.cedulaprofesional\.sep\.gob\.mx\/)/;
+  const bad = urls.filter((u) => !allowed.test(u) && !u.startsWith(d.baseUrl));
   assert.deepEqual(bad, [], 'requests externos inesperados');
   assert.ok(!/fonts\.googleapis|fonts\.gstatic|cdn\./.test(html), 'sin fuentes ni CDNs externos (las fuentes van autoalojadas)');
 });
@@ -177,20 +177,22 @@ test('vCard: estructura 3.0, CRLF, escapes y nombre partido', () => {
   assert.ok(v.includes('FN:Paola García Moctezuma'));
   assert.ok(v.includes('TEL;TYPE=CELL,VOICE:+524421234567'));
   assert.ok(v.includes('EMAIL;TYPE=INTERNET,PREF:p@example.com'));
-  assert.ok(v.includes('URL:https://paola.robertobh.dev/'));
+  assert.ok(v.includes(`URL:${d.baseUrl}`));
   for (const line of v.split('\r\n')) assert.ok(Buffer.byteLength(line) <= 75, `línea > 75 bytes: ${line}`);
   assert.deepEqual(splitName('Paola García Moctezuma'), { given: 'Paola', family: 'García Moctezuma' });
 });
 
 test('dist: archivos esperados', async () => {
   const files = await readdir(outDir);
-  for (const f of ['index.html', 'imprimir.html', 'imprimir-whatsapp.html', '404.html', 'qr.svg', 'qr-print.svg', 'qr-print.png', 'qr-whatsapp.svg', 'qr-whatsapp.png', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', '.nojekyll', 'CNAME', d.vcfName, 'og.png', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) {
+  for (const f of ['index.html', 'imprimir.html', 'imprimir-whatsapp.html', '404.html', 'qr.svg', 'qr-print.svg', 'qr-print.png', 'qr-whatsapp.svg', 'qr-whatsapp.png', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', '.nojekyll', d.vcfName, 'og.png', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) {
     assert.ok(files.includes(f), `falta ${f}`);
   }
+  const wantsCname = cfg.site.github_pages_cname && !d.host.endsWith('.github.io');
+  assert.equal(files.includes('CNAME'), wantsCname, 'CNAME solo con dominio propio');
   for (const f of ['fonts/italiana-400.woff2', 'fonts/jost-var.woff2', 'brand/logo-black.svg', 'brand/logo-cream.svg', 'brand/wordmark-black.svg', 'brand/firma-cream.svg', 'brand/firma-black.svg']) {
     assert.ok((await readFile(path.join(outDir, f))).length > 500, `falta o está vacío ${f}`);
   }
-  assert.equal((await readFile(path.join(outDir, 'CNAME'), 'utf8')).trim(), 'paola.robertobh.dev');
+  if (wantsCname) assert.equal((await readFile(path.join(outDir, 'CNAME'), 'utf8')).trim(), d.host);
 });
 
 test('publicado: la vCard de dist lleva el mismo número, nombre y URL que la página', async () => {
