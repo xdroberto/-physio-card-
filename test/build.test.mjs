@@ -71,6 +71,22 @@ test('promo: tokens y fecha larga en español, y el build exige sus campos', asy
 test('qrUrl: agrega src sin romper la URL', () => {
   assert.equal(qrUrl('https://paola.robertobh.dev/', 'x'), 'https://paola.robertobh.dev/?src=x');
   assert.equal(qrUrl('https://paola.robertobh.dev/', ''), 'https://paola.robertobh.dev/');
+  assert.equal(qrUrl('https://xdroberto.github.io/-physio-card-/', 'qr-hoja'), 'https://xdroberto.github.io/-physio-card-/?src=qr-hoja');
+});
+
+test('site.url con ruta (github.io/repo/): manifest, 404 y QR respetan la base y no se escribe CNAME', async () => {
+  const gh = structuredClone(cfg); gh.site.url = 'https://xdroberto.github.io/-physio-card-/';
+  assert.equal(validate(gh).length, 0, validate(gh).join('\n'));
+  const dd = derive(gh);
+  assert.equal(dd.basePath, '/-physio-card-/');
+  assert.equal(dd.qrSheetUrl, 'https://xdroberto.github.io/-physio-card-/?src=qr-hoja');
+  const { renderManifest, render404 } = await import('../scripts/render-misc.mjs');
+  const m = JSON.parse(renderManifest({ cfg: gh, d: dd }));
+  assert.equal(m.start_url, '/-physio-card-/?src=inicio#qr');
+  assert.equal(m.icons[0].src, '/-physio-card-/icon-192.png');
+  assert.ok(render404({ cfg: gh, d: dd }).includes('url=/-physio-card-/'));
+  const bad = structuredClone(cfg); bad.site.url = 'https://paola.robertobh.dev/?x=1';
+  assert.ok(validate(bad).some((p) => p.includes('site.url')));
 });
 
 test('index.html: CTAs y metadatos esenciales', () => {
@@ -93,6 +109,8 @@ test('index.html: CTAs y metadatos esenciales', () => {
   assert.ok(html.includes(`${esc(cfg.how.price_label)}: <b class="num">${esc(cfg.how.price)}</b>`), 'precio regular publicado');
   assert.ok(html.includes(d.phoneDisplay), 'el teléfono de la tarjeta impresa, tal cual');
   assert.ok(html.includes(esc(cfg.hero.headline)), 'la frase de la tarjeta impresa');
+  const visible = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
+  assert.ok(!visible.includes(d.host), 'el dominio no aparece como texto en la página');
   assert.ok(html.includes(`data-until="${cfg.promo.until}"`), 'la promo lleva su fecha de vencimiento');
   assert.ok(d.pains.every((p) => p.message.startsWith(cfg.whatsapp.greeting_event)), 'cada chip empieza con el saludo del evento (el reemplazo por src=compartido depende de ello)');
   assert.ok(html.includes('aria-label="Copiar cédula profesional') && html.includes('<span class="sr-only">antes </span>'), 'accesibilidad: cédula y precio tachado');
@@ -133,7 +151,7 @@ test('imprimir.html: QR grande, número de respaldo y dominio', () => {
   assert.match(print, /size: letter portrait/);
   assert.match(print, /<svg[^>]*>[\s\S]*<\/svg>/);
   assert.ok(print.includes(d.phoneDisplay));
-  assert.ok(print.includes(d.host));
+  assert.ok(!print.includes(d.host), 'la hoja no muestra el dominio');
   assert.ok(print.includes(`precio regular ${esc(cfg.promo.regular_price)}`), 'la hoja ancla el precio regular');
   assert.ok(print.includes(esc(cfg.promo.price)), 'la hoja anuncia la promo con precio');
   assert.ok(print.includes(formatLongDate(cfg.promo.until).replace(/ de 20\d\d$/, '')), 'fecha de vencimiento en formato largo');

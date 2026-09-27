@@ -24,8 +24,8 @@ export function validate(cfg) {
       `contact.whatsapp debe ser el número con lada de país y SIN "+", solo dígitos (ej. 524421234567). Valor actual: "${wa}"`,
     );
   }
-  if (!/^https:\/\/[^/\s]+\/?$/.test(cfg.site?.url || '')) {
-    problems.push(`site.url debe ser https://dominio/ sin ruta. Valor actual: "${cfg.site?.url}"`);
+  if (!/^https:\/\/[^/\s]+(\/[^\s?#]*)?$/.test(cfg.site?.url || '')) {
+    problems.push(`site.url debe ser https://dominio/ (o https://usuario.github.io/repo/). Valor actual: "${cfg.site?.url}"`);
   }
   if (!cfg.person?.name) problems.push('person.name es obligatorio');
   const disp = String(cfg.contact?.phone_display || '').replace(/\D/g, '');
@@ -96,6 +96,7 @@ export function derive(cfg) {
   });
   return {
     baseUrl: base,
+    basePath: new URL(base).pathname,
     host: new URL(base).host,
     waBase,
     prefillEvent,
@@ -151,7 +152,7 @@ export async function build({ allowPlaceholders = process.env.ALLOW_PLACEHOLDERS
   await writeFile(path.join(outDir, 'robots.txt'), renderRobots(ctx));
   await writeFile(path.join(outDir, 'sitemap.xml'), renderSitemap(ctx));
   await writeFile(path.join(outDir, '.nojekyll'), '');
-  if (cfg.site.github_pages_cname) await writeFile(path.join(outDir, 'CNAME'), d.host + '\n');
+  if (cfg.site.github_pages_cname && !d.host.endsWith('.github.io')) await writeFile(path.join(outDir, 'CNAME'), d.host + '\n');
 
   if (existsSync(PUBLIC)) await cp(PUBLIC, outDir, { recursive: true });
   await writeBrandVariants(brand, outDir, { black: cfg.theme.black, cream: cfg.theme.cream });

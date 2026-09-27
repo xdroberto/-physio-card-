@@ -10,7 +10,6 @@ import { loadBrand, inlineSvg, faviconSvg } from './brand.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cfg = JSON.parse(await readFile(path.join(ROOT, 'card.config.json'), 'utf8'));
 const { person, contact, hero, theme: t } = cfg;
-const host = new URL(cfg.site.url).host;
 const brand = await loadBrand(path.join(ROOT, 'public'));
 const b64 = (f) => readFile(path.join(ROOT, 'public/fonts', f)).then((b) => b.toString('base64'));
 const italiana = await b64('italiana-400.woff2');
@@ -37,7 +36,7 @@ ${inlineSvg(brand.wordmark, { className: 'wordmark' })}
 ${inlineSvg(brand.firma, { className: 'firma' })}
 <h1>${esc(hero.headline)}</h1>
 <div class="row"><div class="citas"><span>${esc(contact.phone_label || 'Citas')}</span><b>${esc(phone)}</b></div>
-<div class="zona">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}<br><span class="url">${esc(host)}</span></div></div>
+<div class="zona">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}</div></div>
 </body></html>`;
 
 const iconSvg = faviconSvg(brand, { cream: t.cream, black: t.black });

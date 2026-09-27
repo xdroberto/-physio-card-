@@ -205,7 +205,6 @@ section+section{border-top:1px solid var(--line-soft)}
 .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .grid2 .btn{padding-left:10px;padding-right:10px}
 .legal{margin-top:20px;font-size:14px;font-weight:300;color:var(--muted);display:grid;gap:6px}
-.legal .host{font-weight:500;color:var(--ink)}
 
 /* ---------- Pie: el frente de la tarjeta ---------- */
 .front{border-top:1px solid var(--line-soft);margin-top:20px;padding:34px 20px 20px;text-align:center;display:grid;justify-items:center;gap:14px}
@@ -232,7 +231,6 @@ dialog.qr::backdrop{background:var(--cream)}
 .qr__brand .firma{width:150px}
 .qr__hint{font-size:15.5px;font-weight:300;color:var(--muted);max-width:34ch}
 .qr__tip{font-size:14px;font-weight:500;color:var(--ink)}
-.qr__url{font-weight:500;font-size:16px;letter-spacing:.02em}
 .qr__close{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;width:56px;height:56px;border-radius:50%;border:1.5px solid var(--ink);background:var(--cream);font-size:28px;line-height:1;color:var(--ink);cursor:pointer;touch-action:manipulation}
 
 /* ---------- Toast ---------- */
@@ -310,7 +308,6 @@ dialog.qr::backdrop{background:var(--cream)}
       <p>${esc(cs.coverage)}</p>
       <p>${esc(person.name)}. ${esc(person.title_long || person.title)}.${person.cedula ? ` Cédula profesional ${esc(person.cedula)}.` : ''}</p>
       ${cs.disclaimer ? `<p>${esc(cs.disclaimer)}</p>` : ''}
-      <p class="host">${esc(d.host)}</p>
     </div>
   </section>
 </main>
@@ -333,7 +330,6 @@ dialog.qr::backdrop{background:var(--cream)}
     <div class="qr__brand"><img class="wordmark" src="brand/wordmark-black.svg" width="${brand.wordmark.w.toFixed(0)}" height="${brand.wordmark.h.toFixed(0)}" alt="${attr(person.title)}">${firmaImg('firma', 'black')}</div>
     <p class="qr__hint">${esc(qrm?.hint || '')}</p>
     ${qrm?.brightness_toast ? `<p class="qr__tip">${esc(qrm.brightness_toast)}</p>` : ''}
-    <p class="qr__url">${esc(d.host)}</p>
   </div>
 </dialog>
 

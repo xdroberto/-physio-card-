@@ -44,7 +44,6 @@ export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' 
   .fallback .lbl { font-size: 10.5pt; letter-spacing: .12em; text-transform: uppercase; color: #4A423E; display: block; }
   .fallback b { font-size: 24pt; font-weight: 300; display: block; letter-spacing: .01em; }
   .fallback .right { text-align: right; font-size: 12pt; font-weight: 300; color: #4A423E; line-height: 1.35; }
-  .fallback .url { font-weight: 500; color: ${t.black}; font-size: 14pt; }
   .noprint { position: fixed; top: 0; left: 0; right: 0; background: #111; color: #fff; padding: 10px 16px; font-size: 14px; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
   .noprint button { font: inherit; background: ${t.cream}; color: ${t.black}; border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 600; }
   @media print { .noprint { display: none; } .sheet { margin: 0; box-shadow: none; } }
@@ -66,7 +65,7 @@ export function renderPrint({ cfg, d, svgPrint, svgWa, brand }, { mode = 'site' 
   ${d.printPromoLine ? `<div class="promo">${esc(d.printPromoLine)}</div>` : ''}
   <div class="fallback">
     <div><span class="lbl">${esc(contact.phone_label || 'Citas')} · ${esc(p.fallback_label || 'si el QR no abre')}</span><b>${esc(d.phoneDisplay)}</b></div>
-    <div class="right">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}${isWa ? '' : `<br><span class="url">${esc(d.host)}</span>`}</div>
+    <div class="right">${esc(person.zone || person.city)}<br>${esc(person.cedula_label || 'Céd. Prof.')} ${esc(person.cedula)}</div>
   </div>
 </main>
 </body>
