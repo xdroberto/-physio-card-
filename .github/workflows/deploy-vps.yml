@@ -1,0 +1,72 @@
+# Alternativa: deploy al VPS de Hetzner (el mismo que sirve robertobh.dev) por scp.
+# Solo se dispara a mano (workflow_dispatch) para no pelear con GitHub Pages.
+#
+# Requisitos:
+#   1. Secret DEPLOY_SSH_KEY en este repo (misma llave dedicada que usa robertobh.dev).
+#   2. En el VPS, correr una vez deploy/setup-vps.sh (crea /var/www/paola, vhost y cert).
+name: "Deploy — VPS Hetzner"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Copy files
+        uses: appleboy/scp-action@917f8b81dfc1ccd331fef9e2d61bdc6c8be94634 # v0.1.7
+        with:
+          host: 178.156.248.110
+          username: root
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "dist/*"
+          target: "/var/www/paola/"
+          strip_components: 1
+
+      - name: Fix permissions
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 178.156.248.110
+          username: root
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            chmod -R u=rwX,go=rX /var/www/paola/
