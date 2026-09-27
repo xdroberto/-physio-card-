@@ -159,14 +159,13 @@ test('imprimir.html: QR grande, número de respaldo y dominio', () => {
   assert.ok(print.includes('class="logo"') && print.includes('brand/firma-black.svg'), 'la hoja lleva el frente de la tarjeta');
 });
 
-test('imprimir-panfletos.html: 15 tarjetitas con QR, teléfono y marca', async () => {
+test('imprimir-panfletos.html: hoja con 10 dientes recortables solo con teléfono', async () => {
   const fl = await readFile(path.join(outDir, 'imprimir-panfletos.html'), 'utf8');
-  assert.equal((fl.match(/class="mini"/g) || []).length, 15);
-  assert.equal((fl.match(/<svg/g) || []).length >= 16, true, 'QR grande + 15 QR chicos');
-  assert.equal((fl.match(new RegExp(d.phoneDisplay.replace(/\s/g, '\\s'), 'g')) || []).length, 16, 'teléfono en la hoja y en cada tarjetita');
+  assert.equal((fl.match(/class="tab"/g) || []).length, 10);
+  assert.equal((fl.match(new RegExp(d.phoneDisplay.replace(/\s/g, '\\s'), 'g')) || []).length, 11, 'teléfono arriba y en cada diente');
+  assert.equal((fl.match(/<svg/g) || []).length, 4, 'un solo QR (logo, wordmark y tijeras son los otros svg)');
   assert.ok(!fl.includes(d.host), 'sin dominio visible');
-  const tabSvg = await qrSvg(`${d.baseUrl}?src=qr-panfleto`, { ecl: 'M', margin: 2 });
-  assert.ok(fl.includes(tabSvg), 'las tarjetitas llevan su propio QR con fuente qr-panfleto');
+  assert.ok(fl.includes('writing-mode: vertical-rl'), 'texto vertical en los dientes');
 });
 
 test('imprimir-whatsapp.html: hoja de respaldo con QR directo a wa.me', async () => {

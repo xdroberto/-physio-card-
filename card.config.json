@@ -44,10 +44,10 @@
   },
   "whatsapp": {
     "greeting_event": "Hola Paola, la vi en la carrera de MTB de San José Iturbide.",
-    "greeting_generic": "Hola Paola, vi su tarjeta digital.",
-    "ask": "Me interesa una sesión de fisioterapia a domicilio. ¿Qué días tiene disponibles?",
-    "promo_message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Me interesa la promoción de la primera sesión a domicilio. ¿Qué días tiene disponibles?",
-    "symptom_template": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Presento molestias en {zona}. ¿Podríamos agendar una sesión a domicilio?"
+    "greeting_generic": "Hola Paola, me compartieron su tarjeta digital.",
+    "ask": "Me gustaría agendar una sesión de fisioterapia a domicilio. ¿Qué días y horarios tiene disponibles?",
+    "promo_message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Me gustaría aprovechar la promoción de la primera sesión a domicilio. ¿Qué días y horarios tiene disponibles?",
+    "symptom_template": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Tengo molestias en {zona}. ¿Qué días y horarios tiene disponibles para una sesión a domicilio?"
   },
   "hero": {
     "headline": "Rehabilitación integral a domicilio",
@@ -92,15 +92,15 @@
       },
       {
         "label": "Manos y antebrazos dormidos",
-        "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Se me duermen las manos y los antebrazos al rodar. ¿Podríamos agendar una sesión a domicilio?"
+        "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Se me duermen las manos y los antebrazos al rodar. ¿Qué días y horarios tiene disponibles para una sesión a domicilio?"
       },
       {
         "label": "Masaje de descarga",
-        "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Me interesa un masaje de descarga a domicilio. ¿Qué días tiene disponibles?"
+        "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Me gustaría agendar un masaje de descarga a domicilio. ¿Qué días y horarios tiene disponibles?"
       },
       {
         "label": "Esguinces, caídas y tendinitis",
-        "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Tengo una lesión (esguince, caída o tendinitis) y me gustaría una valoración. ¿Podríamos agendar una sesión a domicilio?"
+        "message": "Hola Paola, la vi en la carrera de MTB de San José Iturbide. Tengo una lesión, no sé si sea un esguince o una tendinitis, y me gustaría que me valorara. ¿Qué días y horarios tiene disponibles para una sesión a domicilio?"
       },
       {
         "label": "Columna y hernias",
