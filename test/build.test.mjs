@@ -159,6 +159,16 @@ test('imprimir.html: QR grande, número de respaldo y dominio', () => {
   assert.ok(print.includes('class="logo"') && print.includes('brand/firma-black.svg'), 'la hoja lleva el frente de la tarjeta');
 });
 
+test('imprimir-panfletos.html: 15 tarjetitas con QR, teléfono y marca', async () => {
+  const fl = await readFile(path.join(outDir, 'imprimir-panfletos.html'), 'utf8');
+  assert.equal((fl.match(/class="mini"/g) || []).length, 15);
+  assert.equal((fl.match(/<svg/g) || []).length >= 16, true, 'QR grande + 15 QR chicos');
+  assert.equal((fl.match(new RegExp(d.phoneDisplay.replace(/\s/g, '\\s'), 'g')) || []).length, 16, 'teléfono en la hoja y en cada tarjetita');
+  assert.ok(!fl.includes(d.host), 'sin dominio visible');
+  const tabSvg = await qrSvg(`${d.baseUrl}?src=qr-panfleto`, { ecl: 'M', margin: 2 });
+  assert.ok(fl.includes(tabSvg), 'las tarjetitas llevan su propio QR con fuente qr-panfleto');
+});
+
 test('imprimir-whatsapp.html: hoja de respaldo con QR directo a wa.me', async () => {
   const wa = await readFile(path.join(outDir, 'imprimir-whatsapp.html'), 'utf8');
   assert.match(wa, /RESPALDO/);
@@ -184,7 +194,7 @@ test('vCard: estructura 3.0, CRLF, escapes y nombre partido', () => {
 
 test('dist: archivos esperados', async () => {
   const files = await readdir(outDir);
-  for (const f of ['index.html', 'imprimir.html', 'imprimir-whatsapp.html', '404.html', 'qr.svg', 'qr-print.svg', 'qr-print.png', 'qr-whatsapp.svg', 'qr-whatsapp.png', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', '.nojekyll', d.vcfName, 'og.png', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) {
+  for (const f of ['index.html', 'imprimir.html', 'imprimir-whatsapp.html', 'imprimir-panfletos.html', '404.html', 'qr.svg', 'qr-print.svg', 'qr-print.png', 'qr-whatsapp.svg', 'qr-whatsapp.png', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', '.nojekyll', d.vcfName, 'og.png', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) {
     assert.ok(files.includes(f), `falta ${f}`);
   }
   const wantsCname = cfg.site.github_pages_cname && !d.host.endsWith('.github.io');

@@ -40,7 +40,7 @@ export function renderManifest({ cfg, d }) {
 
 export function renderRobots({ d }) {
   const base = d.basePath || '/';
-  return `User-agent: *\nAllow: ${base}\nDisallow: ${base}imprimir.html\nDisallow: ${base}imprimir-whatsapp.html\n\nSitemap: ${d.baseUrl}sitemap.xml\n`;
+  return `User-agent: *\nAllow: ${base}\nDisallow: ${base}imprimir.html\nDisallow: ${base}imprimir-whatsapp.html\nDisallow: ${base}imprimir-panfletos.html\n\nSitemap: ${d.baseUrl}sitemap.xml\n`;
 }
 
 export function renderSitemap({ cfg, d }) {

@@ -8,6 +8,7 @@ import { buildVCard } from './vcard.mjs';
 import { qrUrl, qrSvg, qrPng } from './qr.mjs';
 import { renderIndex } from './render-index.mjs';
 import { renderPrint } from './render-print.mjs';
+import { renderFlyer } from './render-flyer.mjs';
 import { render404, renderManifest, renderRobots, renderSitemap } from './render-misc.mjs';
 import { loadBrand, writeBrandVariants, faviconSvg } from './brand.mjs';
 
@@ -135,12 +136,15 @@ export async function build({ allowPlaceholders = process.env.ALLOW_PLACEHOLDERS
   // Respaldo: QR directo a WhatsApp, por si el dominio no está listo. Más denso, ECL M.
   const svgWa = await qrSvg(d.waLink, { ecl: 'M', margin: 4 });
   const pngWa = await qrPng(d.waLink, { ecl: 'M', margin: 4, width: 1600 });
+  // Panfletos recortables: QR chico (2.3 cm), corrección M y margen corto para ganar módulos.
+  const svgTab = await qrSvg(qrUrl(d.baseUrl, cfg.site.source_flyer || 'qr-panfleto'), { ecl: 'M', margin: 2 });
 
   const brand = await loadBrand(PUBLIC);
-  const ctx = { cfg, d, svgScreen, svgPrint, svgWa, brand };
+  const ctx = { cfg, d, svgScreen, svgPrint, svgWa, svgTab, brand };
   await writeFile(path.join(outDir, 'index.html'), renderIndex(ctx));
   await writeFile(path.join(outDir, 'imprimir.html'), renderPrint(ctx, { mode: 'site' }));
   await writeFile(path.join(outDir, 'imprimir-whatsapp.html'), renderPrint(ctx, { mode: 'wa' }));
+  await writeFile(path.join(outDir, 'imprimir-panfletos.html'), renderFlyer(ctx));
   await writeFile(path.join(outDir, '404.html'), render404(ctx));
   await writeFile(path.join(outDir, d.vcfName), buildVCard(cfg));
   await writeFile(path.join(outDir, 'qr.svg'), svgScreen);
@@ -170,6 +174,7 @@ if (isMain) {
       console.log(`  QR hoja impresa  → ${d.qrSheetUrl}   (dist/imprimir.html, dist/qr-print.png)`);
       console.log(`  QR en teléfono   → ${d.qrScreenUrl}   (index.html#qr)`);
       console.log(`  QR de respaldo   → wa.me directo      (dist/imprimir-whatsapp.html, dist/qr-whatsapp.png)`);
+      console.log(`  Panfletos        → ${qrUrl(d.baseUrl, 'qr-panfleto')}   (dist/imprimir-panfletos.html)`);
       console.log(`  WhatsApp         → ${d.waLink.slice(0, 70)}…`);
     })
     .catch((err) => {
